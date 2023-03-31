@@ -18,6 +18,8 @@
 
 import { Vec3 } from '../math/Vec3.js';
 
+import { getGlContext } from './Renderer.js';
+
 const tempVec3 = new Vec3();
 
 let ID = 1;
@@ -27,9 +29,9 @@ let ATTR_ID = 1;
 let isBoundsWarned = false;
 
 export class Geometry {
-    constructor(gl, attributes = {}) {
-        if (!gl.canvas) console.error('gl not passed as first argument to Geometry');
-        this.gl = gl;
+    constructor(attributes = {}) {
+        if (getGlContext().canvas === null) console.error('gl not passed as first argument to Geometry');
+        this.gl = getGlContext();
         this.attributes = attributes;
         this.id = ID++;
 

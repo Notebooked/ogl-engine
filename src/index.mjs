@@ -7,6 +7,9 @@ export { Transform } from './core/Transform.js';
 export { Mesh } from './core/Mesh.js';
 export { Texture } from './core/Texture.js';
 export { RenderTarget } from './core/RenderTarget.js';
+export { Game } from './core/Game.js';
+
+export { getGlContext } from './core/Renderer.js';
 
 // Maths
 export { Color } from './math/Color.js';

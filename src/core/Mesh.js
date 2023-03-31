@@ -2,13 +2,15 @@ import { Transform } from './Transform.js';
 import { Mat3 } from '../math/Mat3.js';
 import { Mat4 } from '../math/Mat4.js';
 
+import { getGlContext } from './Renderer.js';
+
 let ID = 0;
 
 export class Mesh extends Transform {
-    constructor(gl, { geometry, program, mode = gl.TRIANGLES, frustumCulled = true, renderOrder = 0 } = {}) {
+    constructor({ geometry, program, mode = getGlContext().TRIANGLES, frustumCulled = true, renderOrder = 0 } = {}) {
         super();
-        if (!gl.canvas) console.error('gl not passed as first argument to Mesh');
-        this.gl = gl;
+        if (getGlContext().canvas === null) console.error('gl not passed as first argument to Mesh');
+        this.gl = getGlContext;
         this.id = ID++;
         this.geometry = geometry;
         this.program = program;

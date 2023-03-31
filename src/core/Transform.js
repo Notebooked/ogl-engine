@@ -3,10 +3,14 @@ import { Quat } from '../math/Quat.js';
 import { Mat4 } from '../math/Mat4.js';
 import { Euler } from '../math/Euler.js';
 
+//TODO: add directions, clean up visible
+
 export class Transform {
-    constructor() {
-        this.parent = null;
-        this.children = [];
+    constructor(name) {
+        this.name = name;
+
+        this._parent = null;
+        this._children = [];
         this.visible = true;
 
         this.matrix = new Mat4();
@@ -23,20 +27,55 @@ export class Transform {
         this.quaternion.onChange = () => this.rotation.fromQuaternion(this.quaternion);
     }
 
+    get parent() {
+        return this._parent;
+    }
     setParent(parent, notifyParent = true) {
-        if (this.parent && parent !== this.parent) this.parent.removeChild(this, false);
-        this.parent = parent;
+        if (this._parent && parent !== this._parent) this._parent.removeChild(this, false);
+        this._parent = parent;
         if (notifyParent && parent) parent.addChild(this, false);
     }
 
+    get children() {
+        return this._children;
+    }
     addChild(child, notifyChild = true) {
-        if (!~this.children.indexOf(child)) this.children.push(child);
+        if (!~this._children.indexOf(child)) this._children.push(child);
         if (notifyChild) child.setParent(this, false);
     }
-
     removeChild(child, notifyChild = true) {
         if (!!~this.children.indexOf(child)) this.children.splice(this.children.indexOf(child), 1);
         if (notifyChild) child.setParent(null, false);
+    }
+
+    get root() {
+        var current = this;
+        while (current.parent !== null) {
+            current = current.parent;
+        }
+        return current;
+    }
+    findFirstDescendant(name = null, type = null) {
+        var res;
+        this._children.every((child) => {
+            var isChild = true;
+            if (name !== null && child.name !== name) {
+                isChild = false;
+            }
+            if (type !== null && !(child instanceof type)) {
+                isChild = false;
+            }
+            if (isChild === true) { res = child }
+            return false;
+        })
+        if (res !== null) {return res;}
+        this._children.forEach((child) => {
+            var res = child.findFirstDescendant(name, type);
+            if ( res !== null) {
+                return res;
+            }
+        })
+        return null;
     }
 
     updateMatrixWorld(force) {
@@ -78,5 +117,14 @@ export class Transform {
         else this.matrix.lookAt(target, this.position, this.up);
         this.matrix.getRotation(this.quaternion);
         this.rotation.fromQuaternion(this.quaternion);
+    }
+
+    broadcast(func,...args) {
+        if (func in this) {
+            this[func](...args);
+        }
+        this._children.forEach((child) => {
+            child.broadcast(func,...args);
+        });
     }
 }

@@ -4,27 +4,28 @@
 
 let ID = 1;
 
+import { getGlContext } from "./Renderer.js";
+
 // cache of typed arrays used to flatten uniform arrays
 const arrayCacheF32 = {};
 
 export class Program {
     constructor(
-        gl,
         {
             vertex,
             fragment,
             uniforms = {},
 
             transparent = false,
-            cullFace = gl.BACK,
-            frontFace = gl.CCW,
+            cullFace = getGlContext().BACK,
+            frontFace = getGlContext().CCW,
             depthTest = true,
             depthWrite = true,
-            depthFunc = gl.LESS,
+            depthFunc = getGlContext().LESS,
         } = {}
     ) {
-        if (!gl.canvas) console.error('gl not passed as first argument to Program');
-        this.gl = gl;
+        if (getGlContext().canvas === null) console.error('gl not passed as first argument to Program');
+        this.gl = getGlContext();
         this.uniforms = uniforms;
         this.id = ID++;
 
@@ -48,40 +49,40 @@ export class Program {
         }
 
         // compile vertex shader and log errors
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertex);
-        gl.compileShader(vertexShader);
-        if (gl.getShaderInfoLog(vertexShader) !== '') {
-            console.warn(`${gl.getShaderInfoLog(vertexShader)}\nVertex Shader\n${addLineNumbers(vertex)}`);
+        const vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER);
+        this.gl.shaderSource(vertexShader, vertex);
+        this.gl.compileShader(vertexShader);
+        if (this.gl.getShaderInfoLog(vertexShader) !== '') {
+            console.warn(`${this.gl.getShaderInfoLog(vertexShader)}\nVertex Shader\n${addLineNumbers(vertex)}`);
         }
 
         // compile fragment shader and log errors
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragment);
-        gl.compileShader(fragmentShader);
-        if (gl.getShaderInfoLog(fragmentShader) !== '') {
-            console.warn(`${gl.getShaderInfoLog(fragmentShader)}\nFragment Shader\n${addLineNumbers(fragment)}`);
+        const fragmentShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+        this.gl.shaderSource(fragmentShader, fragment);
+        this.gl.compileShader(fragmentShader);
+        if (this.gl.getShaderInfoLog(fragmentShader) !== '') {
+            console.warn(`${this.gl.getShaderInfoLog(fragmentShader)}\nFragment Shader\n${addLineNumbers(fragment)}`);
         }
 
         // compile program and log errors
-        this.program = gl.createProgram();
-        gl.attachShader(this.program, vertexShader);
-        gl.attachShader(this.program, fragmentShader);
-        gl.linkProgram(this.program);
-        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-            return console.warn(gl.getProgramInfoLog(this.program));
+        this.program = this.gl.createProgram();
+        this.gl.attachShader(this.program, vertexShader);
+        this.gl.attachShader(this.program, fragmentShader);
+        this.gl.linkProgram(this.program);
+        if (!this.gl.getProgramParameter(this.program, this.gl.LINK_STATUS)) {
+            return console.warn(this.gl.getProgramInfoLog(this.program));
         }
 
         // Remove shader once linked
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
+        this.gl.deleteShader(vertexShader);
+        this.gl.deleteShader(fragmentShader);
 
         // Get active uniform locations
         this.uniformLocations = new Map();
-        let numUniforms = gl.getProgramParameter(this.program, gl.ACTIVE_UNIFORMS);
+        let numUniforms = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
         for (let uIndex = 0; uIndex < numUniforms; uIndex++) {
-            let uniform = gl.getActiveUniform(this.program, uIndex);
-            this.uniformLocations.set(uniform, gl.getUniformLocation(this.program, uniform.name));
+            let uniform = this.gl.getActiveUniform(this.program, uIndex);
+            this.uniformLocations.set(uniform, this.gl.getUniformLocation(this.program, uniform.name));
 
             // split uniforms' names to separate array and struct declarations
             const split = uniform.name.match(/(\w+)/g);
@@ -101,10 +102,10 @@ export class Program {
         // Get active attribute locations
         this.attributeLocations = new Map();
         const locations = [];
-        const numAttribs = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
+        const numAttribs = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_ATTRIBUTES);
         for (let aIndex = 0; aIndex < numAttribs; aIndex++) {
-            const attribute = gl.getActiveAttrib(this.program, aIndex);
-            const location = gl.getAttribLocation(this.program, attribute.name);
+            const attribute = this.gl.getActiveAttrib(this.program, aIndex);
+            const location = this.gl.getAttribLocation(this.program, attribute.name);
             // Ignore special built-in inputs. eg gl_VertexID, gl_InstanceID
             if (location === -1) continue;
             locations[location] = attribute.name;

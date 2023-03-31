@@ -1,5 +1,5 @@
 import { Vec3 } from '../math/Vec3.js';
-
+import { Color } from '../math/Color.js';
 // TODO: Handle context loss https://www.khronos.org/webgl/wiki/HandlingContextLost
 
 // Not automatic - devs to use these methods manually
@@ -13,7 +13,14 @@ import { Vec3 } from '../math/Vec3.js';
 const tempVec3 = new Vec3();
 let ID = 1;
 
+var gl = null;
+
+export function getGlContext() {
+    return gl;
+}
+
 export class Renderer {
+    #clearColor;
     constructor({
         canvas = document.createElement('canvas'),
         width = 300,
@@ -47,6 +54,8 @@ export class Renderer {
 
         // Attach renderer to gl so that all classes have access to internal state functions
         this.gl.renderer = this;
+
+        gl = this.gl;
 
         // initialise size values
         this.setSize(width, height);
@@ -110,6 +119,8 @@ export class Renderer {
         this.parameters.maxAnisotropy = this.getExtension('EXT_texture_filter_anisotropic')
             ? this.gl.getParameter(this.getExtension('EXT_texture_filter_anisotropic').MAX_TEXTURE_MAX_ANISOTROPY_EXT)
             : 0;
+
+        this.clearColor = new Color(1,1,1,1);
     }
 
     setSize(width, height) {
@@ -198,6 +209,15 @@ export class Renderer {
         if (this.state.depthFunc === value) return;
         this.state.depthFunc = value;
         this.gl.depthFunc(value);
+    }
+
+    get clearColor() {
+        return this.#clearColor;
+    }
+    set clearColor(value) {
+        console.log(value);
+        this.#clearColor = value;
+        this.gl.clearColor(value.r,value.g,value.b,value.a);
     }
 
     activeTexture(value) {

@@ -28,6 +28,10 @@ export class Color extends Array {
         return this[2];
     }
 
+    get a() {
+        return this[3];
+    }
+
     set r(v) {
         this[0] = v;
     }
@@ -40,6 +44,10 @@ export class Color extends Array {
         this[2] = v;
     }
 
+    set a(v) {
+        this[3] = v;
+    }
+
     set(color) {
         if (Array.isArray(color)) return this.copy(color);
         return this.copy(ColorFunc.parseColor(...arguments));
@@ -49,6 +57,7 @@ export class Color extends Array {
         this[0] = v[0];
         this[1] = v[1];
         this[2] = v[2];
+        this[3] = v[3];
         return this;
     }
 }
