@@ -3,6 +3,8 @@
 // TODO: need? encoding = linearEncoding
 // TODO: support non-compressed mipmaps uploads
 
+import { getGlContext } from "./Renderer.js";
+
 const emptyPixel = new Uint8Array(4);
 
 function isPowerOf2(value) {
@@ -13,28 +15,27 @@ let ID = 1;
 
 export class Texture {
     constructor(
-        gl,
         {
             image,
-            target = gl.TEXTURE_2D,
-            type = gl.UNSIGNED_BYTE,
-            format = gl.RGBA,
+            target = getGlContext().TEXTURE_2D,
+            type = getGlContext().UNSIGNED_BYTE,
+            format = getGlContext().RGBA,
             internalFormat = format,
-            wrapS = gl.CLAMP_TO_EDGE,
-            wrapT = gl.CLAMP_TO_EDGE,
+            wrapS = getGlContext().CLAMP_TO_EDGE,
+            wrapT = getGlContext().CLAMP_TO_EDGE,
             generateMipmaps = true,
-            minFilter = generateMipmaps ? gl.NEAREST_MIPMAP_LINEAR : gl.LINEAR,
-            magFilter = gl.LINEAR,
+            minFilter = generateMipmaps ? getGlContext().NEAREST_MIPMAP_LINEAR : getGlContext().LINEAR,
+            magFilter = getGlContext().LINEAR,
             premultiplyAlpha = false,
             unpackAlignment = 4,
-            flipY = target == gl.TEXTURE_2D ? true : false,
+            flipY = target == getGlContext().TEXTURE_2D ? true : false,
             anisotropy = 0,
             level = 0,
             width, // used for RenderTargets or Data Textures
             height = width,
         } = {}
     ) {
-        this.gl = gl;
+        this.gl = getGlContext();
         this.id = ID++;
 
         this.image = image;

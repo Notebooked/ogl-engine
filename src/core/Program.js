@@ -15,7 +15,6 @@ export class Program {
             vertex,
             fragment,
             uniforms = {},
-
             transparent = false,
             cullFace = getGlContext().BACK,
             frontFace = getGlContext().CCW,

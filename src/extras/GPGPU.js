@@ -3,18 +3,18 @@ import { Mesh } from '../core/Mesh.js';
 import { Texture } from '../core/Texture.js';
 import { RenderTarget } from '../core/RenderTarget.js';
 import { Triangle } from './Triangle.js';
+import { getGlContext } from '../core/Renderer.js';
 
 export class GPGPU {
     constructor(
-        gl,
         {
             // Always pass in array of vec4s (RGBA values within texture)
             data = new Float32Array(16),
-            geometry = new Triangle(gl),
+            geometry = new Triangle(),
             type, // Pass in gl.FLOAT to force it, defaults to gl.HALF_FLOAT
         }
     ) {
-        this.gl = gl;
+        this.gl = getGlContext();
         const initialData = data;
         this.passes = [];
         this.geometry = geometry;

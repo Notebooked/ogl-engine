@@ -3,10 +3,10 @@ import { Program } from '../core/Program.js';
 import { Mesh } from '../core/Mesh.js';
 import { Vec2 } from '../math/Vec2.js';
 import { Triangle } from './Triangle.js';
+import { getGlContext } from '../core/Renderer.js';
 
 export class Flowmap {
     constructor(
-        gl,
         {
             size = 128, // default size of the render targets
             falloff = 0.3, // size of the stamp, percentage of the size
@@ -16,7 +16,7 @@ export class Flowmap {
         } = {}
     ) {
         const _this = this;
-        this.gl = gl;
+        this.gl = getGlContext();
 
         // output uniform containing render target textures
         this.uniform = { value: null };

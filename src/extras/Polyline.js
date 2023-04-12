@@ -4,12 +4,12 @@ import { Mesh } from '../core/Mesh.js';
 import { Vec2 } from '../math/Vec2.js';
 import { Vec3 } from '../math/Vec3.js';
 import { Color } from '../math/Color.js';
+import { getGlContext } from '../core/Renderer.js';
 
 const tmp = new Vec3();
 
 export class Polyline {
     constructor(
-        gl,
         {
             points, // Array of Vec3s
             vertex = defaultVertex,
@@ -18,7 +18,7 @@ export class Polyline {
             attributes = {}, // For passing in custom attribs
         }
     ) {
-        this.gl = gl;
+        this.gl = getGlContext();
         this.points = points;
         this.count = points.length;
 
@@ -43,7 +43,6 @@ export class Polyline {
         }
 
         const geometry = (this.geometry = new Geometry(
-            gl,
             Object.assign(attributes, {
                 position: { size: 3, data: this.position },
                 prev: { size: 3, data: this.prev },
@@ -66,13 +65,13 @@ export class Polyline {
         // Set size uniforms' values
         this.resize();
 
-        const program = (this.program = new Program(gl, {
+        const program = (this.program = new Program({
             vertex,
             fragment,
             uniforms,
         }));
 
-        this.mesh = new Mesh(gl, { geometry, program });
+        this.mesh = new Mesh({ geometry, program });
     }
 
     updateGeometry() {

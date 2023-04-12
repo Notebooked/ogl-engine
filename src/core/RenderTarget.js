@@ -1,29 +1,29 @@
 // TODO: test stencil and depth
+import { getGlContext } from './Renderer.js';
 import { Texture } from './Texture.js';
 
 export class RenderTarget {
     constructor(
-        gl,
         {
-            width = gl.canvas.width,
-            height = gl.canvas.height,
-            target = gl.FRAMEBUFFER,
+            width = getGlContext().canvas.width,
+            height = getGlContext().canvas.height,
+            target = getGlContext().FRAMEBUFFER,
             color = 1, // number of color attachments
             depth = true,
             stencil = false,
             depthTexture = false, // note - stencil breaks
-            wrapS = gl.CLAMP_TO_EDGE,
-            wrapT = gl.CLAMP_TO_EDGE,
-            minFilter = gl.LINEAR,
+            wrapS = getGlContext().CLAMP_TO_EDGE,
+            wrapT = getGlContext().CLAMP_TO_EDGE,
+            minFilter = getGlContext().LINEAR,
             magFilter = minFilter,
-            type = gl.UNSIGNED_BYTE,
-            format = gl.RGBA,
+            type = getGlContext().UNSIGNED_BYTE,
+            format = getGlContext().RGBA,
             internalFormat = format,
             unpackAlignment,
             premultiplyAlpha,
         } = {}
     ) {
-        this.gl = gl;
+        this.gl = getGlContext();
         this.width = width;
         this.height = height;
         this.depth = depth;

@@ -13,7 +13,7 @@ import { Color } from '../math/Color.js';
 const tempVec3 = new Vec3();
 let ID = 1;
 
-var gl = null;
+let gl = null;
 
 export function getGlContext() {
     return gl;
@@ -25,7 +25,7 @@ export class Renderer {
         canvas = document.createElement('canvas'),
         width = 300,
         height = 150,
-        dpr = 1,
+        dpr = 2,
         alpha = false,
         depth = true,
         stencil = false,
@@ -338,6 +338,7 @@ export class Renderer {
     }
 
     render({ scene, camera, target = null, update = true, sort = true, frustumCull = true, clear }) {
+        camera.type = 'orthographic'
         if (target === null) {
             // make sure no render target bound so draws to canvas
             this.bindFramebuffer();

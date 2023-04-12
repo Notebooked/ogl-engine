@@ -4,10 +4,10 @@ import { Program } from '../core/Program.js';
 import { Mesh } from '../core/Mesh.js';
 import { RenderTarget } from '../core/RenderTarget.js';
 import { Triangle } from './Triangle.js';
+import { getGlContext } from '../core/Renderer.js';
 
 export class Post {
     constructor(
-        gl,
         {
             width,
             height,
@@ -20,7 +20,7 @@ export class Post {
             targetOnly = null,
         } = {}
     ) {
-        this.gl = gl;
+        this.gl = getGlContext();
 
         this.options = { wrapS, wrapT, minFilter, magFilter };
 

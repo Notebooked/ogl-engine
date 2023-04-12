@@ -1,11 +1,12 @@
+import { getGlContext } from '../core/Renderer.js';
 import { Texture } from '../core/Texture.js';
 
 // TODO: Support cubemaps
 // Generate textures using https://github.com/TimvanScherpenzeel/texture-compressor
 
 export class KTXTexture extends Texture {
-    constructor(gl, { buffer, wrapS = gl.CLAMP_TO_EDGE, wrapT = gl.CLAMP_TO_EDGE, anisotropy = 0, minFilter, magFilter } = {}) {
-        super(gl, {
+    constructor({ buffer, wrapS = getGlContext().CLAMP_TO_EDGE, wrapT = getGlContext().CLAMP_TO_EDGE, anisotropy = 0, minFilter, magFilter } = {}) {
+        super({
             generateMipmaps: false,
             wrapS,
             wrapT,

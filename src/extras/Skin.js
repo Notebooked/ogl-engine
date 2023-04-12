@@ -3,12 +3,13 @@ import { Transform } from '../core/Transform.js';
 import { Mat4 } from '../math/Mat4.js';
 import { Texture } from '../core/Texture.js';
 import { Animation } from './Animation.js';
+import { getGlContext } from '../core/Renderer.js';
 
 const tempMat4 = new Mat4();
 
 export class Skin extends Mesh {
-    constructor(gl, { rig, geometry, program, mode = gl.TRIANGLES } = {}) {
-        super(gl, { geometry, program, mode });
+    constructor({ rig, geometry, program, mode = getGlContext().TRIANGLES } = {}) {
+        super({ geometry, program, mode });
 
         this.createBones(rig);
         this.createBoneTexture();

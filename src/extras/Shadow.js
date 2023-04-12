@@ -1,17 +1,18 @@
 import { Camera } from '../core/Camera.js';
 import { Program } from '../core/Program.js';
 import { RenderTarget } from '../core/RenderTarget.js';
+import { getGlContext } from '../core/Renderer.js';
 
 export class Shadow {
-    constructor(gl, { light = new Camera(gl), width = 1024, height = width }) {
-        this.gl = gl;
+    constructor({light = new Camera(), width = 1024, height = width }) {
+        this.gl = getGlContext();
 
         this.light = light;
 
-        this.target = new RenderTarget(gl, { width, height });
+        this.target = new RenderTarget({ width, height });
         this.targetUniform = { value: this.target.texture };
 
-        this.depthProgram = new Program(gl, {
+        this.depthProgram = new Program({
             vertex: defaultVertex,
             fragment: defaultFragment,
             cullFace: null,

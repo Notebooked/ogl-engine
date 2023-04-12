@@ -9,8 +9,8 @@ const uv = new Vec2();
 const point = new Vec3();
 
 export class Tube extends Geometry {
-    constructor(gl, { path, radius = 1, tubularSegments = 64, radialSegments = 8, closed = false, attributes = {} } = {}) {
-        super(gl, attributes);
+    constructor({ path, radius = 1, tubularSegments = 64, radialSegments = 8, closed = false, attributes = {} } = {}) {
+        super(attributes);
 
         this.path = path;
         this.radius = radius;

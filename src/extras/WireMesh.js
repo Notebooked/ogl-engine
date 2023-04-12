@@ -2,10 +2,11 @@ import { Mesh } from '../core/Mesh.js';
 import { Program } from '../core/Program.js';
 import { Geometry } from '../core/Geometry.js';
 import { Vec3 } from '../math/Vec3.js';
+import { getGlContext } from '../core/Renderer.js';
 
 export class WireMesh extends Mesh {
-    constructor(gl, { geometry, wireColor = new Vec3(0, 0.75, 0.5), ...meshProps } = {}) {
-        const wireProgram = new Program(gl, {
+    constructor({ geometry, wireColor = new Vec3(0, 0.75, 0.5), ...meshProps } = {}) {
+        const wireProgram = new Program({
             vertex,
             fragment,
             uniforms: { wireColor: { value: wireColor } },
@@ -44,12 +45,12 @@ export class WireMesh extends Mesh {
         }
 
         const indicesTyped = indices.length > 65536 ? new Uint32Array(indices) : new Uint16Array(indices);
-        const wireGeometry = new Geometry(gl, {
+        const wireGeometry = new Geometry({
             position: { ...geometry.attributes.position },
             index: { data: indicesTyped },
         });
 
-        super(gl, { ...meshProps, mode: gl.LINES, geometry: wireGeometry, program: wireProgram });
+        super({ ...meshProps, mode: getGlContext().LINES, geometry: wireGeometry, program: wireProgram });
     }
 }
 

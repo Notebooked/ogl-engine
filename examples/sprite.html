@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta
+            name="viewport"
+            content="width=device-width, minimal-ui, viewport-fit=cover, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+        />
+        <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+        <title>OGL • Torus</title>
+        <link href="../oglexamples/assets/main.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="Info">Torus</div>
+        <script type="module">
+            import { Renderer, Camera, Transform, Texture, TextureLoader, Program, Geometry, Mesh, Box, Game, Plane, Orbit, Vec3 } from '../src/index.mjs';
+
+            const vertex = /* glsl */ `
+                attribute vec2 uv;
+                attribute vec3 position;
+
+                uniform mat4 modelViewMatrix;
+                uniform mat4 projectionMatrix;
+
+                varying vec2 vUv;
+
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+
+            const fragment = /* glsl */ `
+                precision highp float;
+
+                uniform sampler2D tMap;
+
+                varying vec2 vUv;
+
+                void main() {
+                    gl_FragColor = texture2D(tMap, vUv * 2.0);
+                }
+            `;
+
+            {
+                const app = new Game();
+                const gl = app.renderer.gl;
+                app.addCanvasToPage();
+
+                const camera = new Camera();
+                camera.position.set(0,0,10);
+                camera.setParent(app);
+
+                const orbit = new Orbit(camera);
+                orbit.setParent(camera);
+
+                const spriteTexture = TextureLoader.load(gl, {
+                    src: {
+                        png: 'assets/grimacing-face.png',
+                    },
+                    wrapS: gl.REPEAT,
+                    wrapT: gl.REPEAT,
+                });
+
+                const spriteGeometry = new Plane({width:0.5,height:0.5});
+
+                const spriteProgram = new Program({
+                    vertex,
+                    fragment,
+                    uniforms: {
+                        tMap: { value: spriteTexture },
+                    },
+                    cullFace: null,
+                });
+                const spritePlane = new Mesh({ geometry: spriteGeometry, program: spriteProgram });
+                spritePlane.setParent(app);
+
+                app.update = () => {
+                    spritePlane.position.x += 0.01;
+                }
+
+                app.mainloop();
+            }
+        </script>
+    </body>
+</html>

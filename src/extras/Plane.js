@@ -1,7 +1,9 @@
 import { Geometry } from '../core/Geometry.js';
 
+// TODO: fix geometry not getting gl context
+
 export class Plane extends Geometry {
-    constructor(gl, { width = 1, height = 1, widthSegments = 1, heightSegments = 1, attributes = {} } = {}) {
+    constructor({ width = 1, height = 1, widthSegments = 1, heightSegments = 1, attributes = {} } = {}) {
         const wSegs = widthSegments;
         const hSegs = heightSegments;
 
@@ -24,7 +26,7 @@ export class Plane extends Geometry {
             index: { data: index },
         });
 
-        super(gl, attributes);
+        super(attributes);
     }
 
     static buildPlane(position, normal, uv, index, width, height, depth, wSegs, hSegs, u = 0, v = 1, w = 2, uDir = 1, vDir = -1, i = 0, ii = 0) {

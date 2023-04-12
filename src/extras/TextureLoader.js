@@ -86,7 +86,7 @@ export class TextureLoader {
             case 'etc1':
             case 'astc':
                 // Load compressed texture using KTX format
-                texture = new KTXTexture(gl, {
+                texture = new KTXTexture({
                     src,
                     wrapS,
                     wrapT,
@@ -100,7 +100,7 @@ export class TextureLoader {
             case 'jpg':
             case 'jpeg':
             case 'png':
-                texture = new Texture(gl, {
+                texture = new Texture({
                     wrapS,
                     wrapT,
                     anisotropy,
@@ -117,7 +117,7 @@ export class TextureLoader {
                 break;
             default:
                 console.warn('No supported format supplied');
-                texture = new Texture(gl);
+                texture = new Texture();
         }
 
         texture.ext = ext;

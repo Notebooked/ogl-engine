@@ -3,6 +3,7 @@ export { Geometry } from './core/Geometry.js';
 export { Program } from './core/Program.js';
 export { Renderer } from './core/Renderer.js';
 export { Camera } from './core/Camera.js';
+export { Node } from './core/Node.js';
 export { Transform } from './core/Transform.js';
 export { Mesh } from './core/Mesh.js';
 export { Texture } from './core/Texture.js';

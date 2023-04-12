@@ -10,10 +10,11 @@ export class Mesh extends Transform {
     constructor({ geometry, program, mode = getGlContext().TRIANGLES, frustumCulled = true, renderOrder = 0 } = {}) {
         super();
         if (getGlContext().canvas === null) console.error('gl not passed as first argument to Mesh');
-        this.gl = getGlContext;
+        this.gl = getGlContext();
         this.id = ID++;
         this.geometry = geometry;
         this.program = program;
+        console.log(this.program)
         this.mode = mode;
 
         // Used to skip frustum culling
