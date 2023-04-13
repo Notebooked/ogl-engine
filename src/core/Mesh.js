@@ -7,10 +7,10 @@ import { getGlContext } from './Renderer.js';
 let ID = 0;
 
 export class Mesh extends Transform {
-    constructor({ geometry, program, mode = getGlContext().TRIANGLES, frustumCulled = true, renderOrder = 0 } = {}) {
+    constructor({ gl = getGlContext(), geometry, program, mode = gl.TRIANGLES, frustumCulled = true, renderOrder = 0 } = {}) {
         super();
         if (getGlContext().canvas === null) console.error('gl not passed as first argument to Mesh');
-        this.gl = getGlContext();
+        this.gl = gl;
         this.id = ID++;
         this.geometry = geometry;
         this.program = program;

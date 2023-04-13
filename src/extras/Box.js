@@ -1,5 +1,4 @@
 import { Geometry } from '../core/Geometry.js';
-import { getGlContext } from '../core/Renderer.js';
 import { Plane } from './Plane.js';
 
 export class Box extends Geometry {

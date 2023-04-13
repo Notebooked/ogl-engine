@@ -9,6 +9,8 @@ export { Mesh } from './core/Mesh.js';
 export { Texture } from './core/Texture.js';
 export { RenderTarget } from './core/RenderTarget.js';
 export { Game } from './core/Game.js';
+export { Sprite } from './core/Sprite.js';
+export { InputManager } from './core/InputManager.js';
 
 export { getGlContext } from './core/Renderer.js';
 

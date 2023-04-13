@@ -16,26 +16,27 @@ let ID = 1;
 export class Texture {
     constructor(
         {
+            gl = getGlContext(),
             image,
-            target = getGlContext().TEXTURE_2D,
-            type = getGlContext().UNSIGNED_BYTE,
-            format = getGlContext().RGBA,
+            target = gl.TEXTURE_2D,
+            type = gl.UNSIGNED_BYTE,
+            format = gl.RGBA,
             internalFormat = format,
-            wrapS = getGlContext().CLAMP_TO_EDGE,
-            wrapT = getGlContext().CLAMP_TO_EDGE,
+            wrapS = gl.CLAMP_TO_EDGE,
+            wrapT = gl.CLAMP_TO_EDGE,
             generateMipmaps = true,
-            minFilter = generateMipmaps ? getGlContext().NEAREST_MIPMAP_LINEAR : getGlContext().LINEAR,
-            magFilter = getGlContext().LINEAR,
+            minFilter = generateMipmaps ? gl.NEAREST_MIPMAP_LINEAR : gl.LINEAR,
+            magFilter = gl.LINEAR,
             premultiplyAlpha = false,
             unpackAlignment = 4,
-            flipY = target == getGlContext().TEXTURE_2D ? true : false,
+            flipY = target == gl.TEXTURE_2D ? true : false,
             anisotropy = 0,
             level = 0,
             width, // used for RenderTargets or Data Textures
             height = width,
         } = {}
     ) {
-        this.gl = getGlContext();
+        this.gl = gl;
         this.id = ID++;
 
         this.image = image;

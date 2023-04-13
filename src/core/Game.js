@@ -2,6 +2,8 @@ import { getGlContext, Renderer } from './Renderer.js';
 import { Camera } from './Camera.js';
 import { Transform } from './Transform.js';
 
+import * as timer from '../util/timer.js';
+
 var then = 0;
 var dt = 0;
 
@@ -58,7 +60,7 @@ export class Game extends Transform {
         this.broadcast('update',dt);
 
         this.render();
-
+        
         requestAnimationFrame((now) => {this.loop(now);})
     }
 }

@@ -12,19 +12,20 @@ const arrayCacheF32 = {};
 export class Program {
     constructor(
         {
+            gl = getGlContext(),
             vertex,
             fragment,
             uniforms = {},
             transparent = false,
-            cullFace = getGlContext().BACK,
-            frontFace = getGlContext().CCW,
+            cullFace = gl.BACK,
+            frontFace = gl.CCW,
             depthTest = true,
             depthWrite = true,
-            depthFunc = getGlContext().LESS,
+            depthFunc = gl.LESS,
         } = {}
     ) {
-        if (getGlContext().canvas === null) console.error('gl not passed as first argument to Program');
-        this.gl = getGlContext();
+        if (gl.canvas === null) console.error('gl not passed as first argument to Program');
+        this.gl = gl;
         this.uniforms = uniforms;
         this.id = ID++;
 

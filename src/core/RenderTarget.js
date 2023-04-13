@@ -5,25 +5,26 @@ import { Texture } from './Texture.js';
 export class RenderTarget {
     constructor(
         {
-            width = getGlContext().canvas.width,
-            height = getGlContext().canvas.height,
-            target = getGlContext().FRAMEBUFFER,
+            gl = getGlContext(),
+            width = gl.canvas.width,
+            height = gl.canvas.height,
+            target = gl.FRAMEBUFFER,
             color = 1, // number of color attachments
             depth = true,
             stencil = false,
             depthTexture = false, // note - stencil breaks
-            wrapS = getGlContext().CLAMP_TO_EDGE,
-            wrapT = getGlContext().CLAMP_TO_EDGE,
-            minFilter = getGlContext().LINEAR,
+            wrapS = gl.CLAMP_TO_EDGE,
+            wrapT = gl.CLAMP_TO_EDGE,
+            minFilter = gl.LINEAR,
             magFilter = minFilter,
-            type = getGlContext().UNSIGNED_BYTE,
-            format = getGlContext().RGBA,
+            type = gl.UNSIGNED_BYTE,
+            format = gl.RGBA,
             internalFormat = format,
             unpackAlignment,
             premultiplyAlpha,
         } = {}
     ) {
-        this.gl = getGlContext();
+        this.gl = gl;
         this.width = width;
         this.height = height;
         this.depth = depth;

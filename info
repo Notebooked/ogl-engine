@@ -1,0 +1,3 @@
+should only be ONE RENDERER
+why:
+because helper classes (such as Program) have to access gl cotnext with getGlContext, and for that there must only be one gl context.

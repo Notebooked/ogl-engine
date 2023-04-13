@@ -1,14 +1,9 @@
-GLOBAL GL CONTEXT
-
-make sprite class
-
-make orbit controls script child of camera (orbit wont update)
-
-make EVERYTHING a node
+only one renderer / only one canvas
 
 make transform do global transform as well
 
-make input manager
+improve input manager
 
 fix resize function for camera to allow perspective and orthographic
 
+do stuff involving constructor argumens for node and gl

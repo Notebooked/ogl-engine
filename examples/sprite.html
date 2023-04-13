@@ -9,77 +9,56 @@
         />
         <link rel="icon" type="image/png" href="assets/favicon.png" />
 
-        <title>OGL • Torus</title>
+        <title>OGL Engine • Sprite Demo</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
     </head>
     <body>
-        <div class="Info">Torus</div>
+        <div class="Info">Sprite Demo</div>
         <script type="module">
-            import { Renderer, Camera, Transform, Texture, TextureLoader, Program, Geometry, Mesh, Box, Game, Plane, Orbit, Vec3 } from '../src/index.mjs';
+            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, InputManager } from '../src/index.mjs';
 
-            const vertex = /* glsl */ `
-                attribute vec2 uv;
-                attribute vec3 position;
+            class Player extends Sprite {
+                constructor(name,parent=null) {
+                    const spriteTexture = TextureLoader.load({src: 'assets/grimacing-face.png'})
+                    super({texture: spriteTexture})
+                    this.scale = new Vec3(0.5,0.5,1);
 
-                uniform mat4 modelViewMatrix;
-                uniform mat4 projectionMatrix;
-
-                varying vec2 vUv;
-
-                void main() {
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    this.speed = 4;
                 }
-            `;
-
-            const fragment = /* glsl */ `
-                precision highp float;
-
-                uniform sampler2D tMap;
-
-                varying vec2 vUv;
-
-                void main() {
-                    gl_FragColor = texture2D(tMap, vUv * 2.0);
+                update(dt) {
+                    if (this.root.getNode("Input Manager").getInput("KeyA")) {
+                        this.position.x -= this.speed * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("KeyD")) {
+                        this.position.x += this.speed * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("KeyS")) {
+                        this.position.y -= this.speed * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("KeyW")) {
+                        this.position.y += this.speed * dt;
+                    }
                 }
-            `;
+            }
 
             {
                 const app = new Game();
                 const gl = app.renderer.gl;
                 app.addCanvasToPage();
 
+                app.renderer.dpr = 3;
+
                 const camera = new Camera();
                 camera.position.set(0,0,10);
                 camera.setParent(app);
 
-                const orbit = new Orbit(camera);
-                orbit.setParent(camera);
+                const inputManager = new InputManager("Input Manager");
+                inputManager.setParent(app);
+/*                 const orbit = new Orbit(camera);
+                orbit.setParent(camera); */
 
-                const spriteTexture = TextureLoader.load(gl, {
-                    src: {
-                        png: 'assets/grimacing-face.png',
-                    },
-                    wrapS: gl.REPEAT,
-                    wrapT: gl.REPEAT,
-                });
-
-                const spriteGeometry = new Plane({width:0.5,height:0.5});
-
-                const spriteProgram = new Program({
-                    vertex,
-                    fragment,
-                    uniforms: {
-                        tMap: { value: spriteTexture },
-                    },
-                    cullFace: null,
-                });
-                const spritePlane = new Mesh({ geometry: spriteGeometry, program: spriteProgram });
-                spritePlane.setParent(app);
-
-                app.update = () => {
-                    spritePlane.position.x += 0.01;
-                }
+                const player = new Player();
+                player.setParent(app);
 
                 app.mainloop();
             }

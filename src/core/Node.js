@@ -33,10 +33,26 @@ export class Node {
         }
         return current;
     }
-    
+
+    getNode(name = null, type = null) {
+        var res;
+        this.traverse((child) => {
+            var isChild = true;
+            if (name !== null && child.name !== name) {
+                isChild = false;
+            }
+            if (type !== null && !(child instanceof type)) {
+                isChild = false;
+            }
+            if (isChild === true) { res = child; }
+            return false;
+        })
+        return res;
+    }
+
     findFirstDescendant(name = null, type = null) {
         var res;
-        this._children.every((child) => {
+        this.traverse((child) => {
             var isChild = true;
             if (name !== null && child.name !== name) {
                 isChild = false;
@@ -47,10 +63,10 @@ export class Node {
             if (isChild === true) { res = child }
             return false;
         })
-        if (res !== null) {return res;}
+        if (res !== null) { return res; }
         this._children.forEach((child) => {
             var res = child.findFirstDescendant(name, type);
-            if ( res !== null) {
+            if (res !== null) {
                 return res;
             }
         })
@@ -65,12 +81,12 @@ export class Node {
         }
     }
 
-    broadcast(func,...args) {
+    broadcast(func, ...args) {
         if (func in this) {
             this[func](...args);
         }
         this._children.forEach((child) => {
-            child.broadcast(func,...args);
+            child.broadcast(func, ...args);
         });
     }
 }

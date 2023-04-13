@@ -1,4 +1,5 @@
 import { Texture } from '../core/Texture.js';
+import { getGlContext } from '../index.mjs';
 import { KTXTexture } from './KTXTexture.js';
 
 // For compressed textures, generate using https://github.com/TimvanScherpenzeel/texture-compressor
@@ -8,8 +9,8 @@ const supportedExtensions = [];
 
 export class TextureLoader {
     static load(
-        gl,
         {
+            gl = getGlContext(),
             src, // string or object of extension:src key-values
             // {
             //     pvrtc: '...ktx',
