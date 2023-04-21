@@ -1,5 +1,5 @@
 import { Texture } from '../core/Texture.js';
-import { getGlContext } from '../index.mjs';
+import { getGlContext } from '../core/Canvas.js';
 import { KTXTexture } from './KTXTexture.js';
 
 // For compressed textures, generate using https://github.com/TimvanScherpenzeel/texture-compressor

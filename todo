@@ -1,9 +1,10 @@
-only one renderer / only one canvas
-
-make transform do global transform as well
+make transform take into account non transform parents
 
 improve input manager
 
 fix resize function for camera to allow perspective and orthographic
+fix aspect ratio for camera to adjust for height and width (preserve height, preserve width)
 
 do stuff involving constructor argumens for node and gl
+
+make orbit an actual class and automatically link parent as camera

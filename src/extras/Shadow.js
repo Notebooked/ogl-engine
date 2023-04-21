@@ -1,7 +1,7 @@
 import { Camera } from '../core/Camera.js';
 import { Program } from '../core/Program.js';
 import { RenderTarget } from '../core/RenderTarget.js';
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 
 export class Shadow {
     constructor({light = new Camera(), width = 1024, height = width }) {

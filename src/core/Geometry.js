@@ -18,7 +18,7 @@
 
 import { Vec3 } from '../math/Vec3.js';
 
-import { getGlContext } from './Renderer.js';
+import { getGlContext } from './Canvas.js';
 
 const tempVec3 = new Vec3();
 

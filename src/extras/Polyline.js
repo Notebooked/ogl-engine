@@ -4,7 +4,7 @@ import { Mesh } from '../core/Mesh.js';
 import { Vec2 } from '../math/Vec2.js';
 import { Vec3 } from '../math/Vec3.js';
 import { Color } from '../math/Color.js';
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 
 const tmp = new Vec3();
 

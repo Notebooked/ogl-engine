@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta
+            name="viewport"
+            content="width=device-width, minimal-ui, viewport-fit=cover, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+        />
+        <link rel="icon" type="image/png" href="assets/favicon.png" />
+
+        <title>OGL Engine • Physics Demo</title>
+        <link href="../oglexamples/assets/main.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="Info">Physics Demo</div>
+        <script src="../src/physics/matter.min.js"></script>
+        <script type="module">
+            // module aliases
+            var Engine = Matter.Engine,
+                Render = Matter.Render,
+                Runner = Matter.Runner,
+                Bodies = Matter.Bodies,
+                Composite = Matter.Composite;
+
+            // create an engine
+            var engine = Engine.create();
+
+            // create a renderer
+            var render = Render.create({
+                element: document.body,
+                engine: engine
+            });
+
+            // create two boxes and a ground
+            var boxA = Bodies.rectangle(400, 200, 80, 80);
+            var boxB = Bodies.rectangle(450, 50, 80, 80);
+            var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
+
+            // add all of the bodies to the world
+            Composite.add(engine.world, [boxA, boxB, ground]);
+
+            // run the renderer
+            Render.run(render);
+
+            // create runner
+            var runner = Runner.create();
+
+            // run the engine
+            Runner.run(runner, engine);
+        </script>
+    </body>
+</html>

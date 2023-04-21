@@ -4,7 +4,7 @@
 
 let ID = 1;
 
-import { getGlContext } from "./Renderer.js";
+import { getGlContext } from './Canvas.js';
 
 // cache of typed arrays used to flatten uniform arrays
 const arrayCacheF32 = {};

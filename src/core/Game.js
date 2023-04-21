@@ -1,6 +1,7 @@
-import { getGlContext, Renderer } from './Renderer.js';
+import { Renderer } from './Renderer.js';
 import { Camera } from './Camera.js';
 import { Transform } from './Transform.js';
+import { getGlContext } from './Canvas.js';
 
 import * as timer from '../util/timer.js';
 
@@ -12,9 +13,7 @@ export class Game extends Transform {
     constructor() {
         super();
 
-        this.canvas = document.createElement("canvas");
-
-        this.renderer = new Renderer({canvas: this.canvas});
+        this.renderer = new Renderer();
     }
 
     get time() {
@@ -22,7 +21,7 @@ export class Game extends Transform {
     }
 
     addCanvasToPage() {
-        document.body.appendChild(this.canvas);
+        document.body.appendChild(getGlContext().canvas);
     }
     resize() {
         const gl = getGlContext();

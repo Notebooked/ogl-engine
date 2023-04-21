@@ -2,7 +2,7 @@ import { Mesh } from '../core/Mesh.js';
 import { Program } from '../core/Program.js';
 import { Geometry } from '../core/Geometry.js';
 import { Vec3 } from '../math/Vec3.js';
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 
 export class WireMesh extends Mesh {
     constructor({ geometry, wireColor = new Vec3(0, 0.75, 0.5), ...meshProps } = {}) {

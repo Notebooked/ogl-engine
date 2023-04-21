@@ -12,7 +12,7 @@ export { Game } from './core/Game.js';
 export { Sprite } from './core/Sprite.js';
 export { InputManager } from './core/InputManager.js';
 
-export { getGlContext } from './core/Renderer.js';
+export { getGlContext } from './core/Canvas.js';
 
 // Maths
 export { Color } from './math/Color.js';

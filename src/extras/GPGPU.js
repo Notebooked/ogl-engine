@@ -3,7 +3,7 @@ import { Mesh } from '../core/Mesh.js';
 import { Texture } from '../core/Texture.js';
 import { RenderTarget } from '../core/RenderTarget.js';
 import { Triangle } from './Triangle.js';
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 
 export class GPGPU {
     constructor(

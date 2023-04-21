@@ -1,4 +1,4 @@
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 import { Texture } from '../core/Texture.js';
 
 // TODO: Support cubemaps

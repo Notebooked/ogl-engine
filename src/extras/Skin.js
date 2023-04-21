@@ -3,7 +3,7 @@ import { Transform } from '../core/Transform.js';
 import { Mat4 } from '../math/Mat4.js';
 import { Texture } from '../core/Texture.js';
 import { Animation } from './Animation.js';
-import { getGlContext } from '../core/Renderer.js';
+import { getGlContext } from '../core/Canvas.js';
 
 const tempMat4 = new Mat4();
 

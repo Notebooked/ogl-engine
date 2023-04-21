@@ -1,28 +1,22 @@
 import { Vec3 } from '../math/Vec3.js';
 import { Color } from '../math/Color.js';
+import { createCanvas, getGlContext, isWebgl2 } from './Canvas.js';
 // TODO: Handle context loss https://www.khronos.org/webgl/wiki/HandlingContextLost
 
 // Not automatic - devs to use these methods manually
 // gl.colorMask( colorMask, colorMask, colorMask, colorMask );
-// gl.clearColor( r, g, b, a );
 // gl.stencilMask( stencilMask );
 // gl.stencilFunc( stencilFunc, stencilRef, stencilMask );
 // gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
 // gl.clearStencil( stencil );
 
 const tempVec3 = new Vec3();
-let ID = 1;
 
 let gl = null;
-
-export function getGlContext() {
-    return gl;
-}
 
 export class Renderer {
     #clearColor;
     constructor({
-        canvas = document.createElement('canvas'),
         width = 300,
         height = 150,
         dpr = 2,
@@ -37,6 +31,7 @@ export class Renderer {
         webgl = 2,
     } = {}) {
         const attributes = { alpha, depth, stencil, antialias, premultipliedAlpha, preserveDrawingBuffer, powerPreference };
+        createCanvas(this, {webgl, attributes});
         this.dpr = dpr;
         this.alpha = alpha;
         this.color = true;
@@ -44,16 +39,8 @@ export class Renderer {
         this.stencil = stencil;
         this.premultipliedAlpha = premultipliedAlpha;
         this.autoClear = autoClear;
-        this.id = ID++;
 
-        // Attempt WebGL2 unless forced to 1, if not supported fallback to WebGL1
-        if (webgl === 2) this.gl = canvas.getContext('webgl2', attributes);
-        this.isWebgl2 = !!this.gl;
-        if (!this.gl) this.gl = canvas.getContext('webgl', attributes);
-        if (!this.gl) console.error('unable to create webgl context');
-
-        // Attach renderer to gl so that all classes have access to internal state functions
-        this.gl.renderer = this;
+        this.gl = getGlContext();
 
         gl = this.gl;
 
@@ -83,7 +70,7 @@ export class Renderer {
         this.extensions = {};
 
         // Initialise extra format types
-        if (this.isWebgl2) {
+        if (isWebgl2()) {
             this.getExtension('EXT_color_buffer_float');
             this.getExtension('OES_texture_float_linear');
         } else {

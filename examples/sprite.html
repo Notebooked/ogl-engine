@@ -38,6 +38,20 @@
                     if (this.root.getNode("Input Manager").getInput("KeyW")) {
                         this.position.y += this.speed * dt;
                     }
+                    if (this.root.getNode("Input Manager").getInput("ArrowLeft")) {
+                        this.rotation.z += 2 * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("ArrowRight")) {
+                        this.rotation.z -= 2 * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("ArrowUp")) {
+                        this.scale.x += 1.2 * dt;
+                        this.scale.y += 1.2 * dt;
+                    }
+                    if (this.root.getNode("Input Manager").getInput("ArrowDown")) {
+                        this.scale.x -= 1.2 * dt;
+                        this.scale.y -= 1.2 * dt;
+                    }
                 }
             }
 
@@ -59,6 +73,10 @@
 
                 const player = new Player();
                 player.setParent(app);
+
+                const test = new Sprite({texture:TextureLoader.load({src:'assets/grimacing-face.png'})});
+                test.setParent(player);
+                test.position = new Vec3(3,3,0);
 
                 app.mainloop();
             }

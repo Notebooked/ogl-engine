@@ -3,7 +3,7 @@
 // TODO: need? encoding = linearEncoding
 // TODO: support non-compressed mipmaps uploads
 
-import { getGlContext } from "./Renderer.js";
+import { getGlContext } from './Canvas.js';
 
 const emptyPixel = new Uint8Array(4);
 

@@ -1,5 +1,5 @@
 // TODO: test stencil and depth
-import { getGlContext } from './Renderer.js';
+import { getGlContext } from './Canvas.js';
 import { Texture } from './Texture.js';
 
 export class RenderTarget {
