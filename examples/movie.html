@@ -11,6 +11,7 @@
 
         <title>OGL • Torus</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
     </head>
     <body>
         <div class="Info">Torus</div>
@@ -71,7 +72,7 @@
                     target: new Vec3(0, 0.7, 0),
                 }); 
 
-                camera.setParent(app);
+                camera.setParent(app.scene);
 
                 const videoGeometry = new Box({ width: 1.78, height: 1, depth: 1.78 });
 
@@ -108,15 +109,14 @@
                 });
                 videoMesh.position.set(0, 0.5, -4);
                 videoMesh.scale.set(1.5);
-                videoMesh.setParent(app);
+                videoMesh.setParent(app.scene);
 
-                app.update = (dt) => {
+                app.scene.update = (dt) => {
                     // Attach video and/or update texture when video is ready
                     if (video.readyState >= video.HAVE_ENOUGH_DATA) {
                         if (!videoTexture.image) videoTexture.image = video;
                         videoTexture.needsUpdate = true;
                     }
-
                     videoMesh.rotation.y += 0.003;
                 }
                 app.mainloop();

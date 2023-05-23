@@ -60,8 +60,8 @@ export class Camera extends Transform {
         return this;
     }
 
-    lookAt(target) {
-        super.lookAt(target, true);
+    lookAt(target, up = new Vec3(0, 1, 0)) {
+        super.lookAt(target, up, true);
         return this;
     }
 

@@ -1,5 +1,6 @@
 import * as EulerFunc from './functions/EulerFunc.js';
 import { Mat4 } from './Mat4.js';
+import { Signal } from '../core/Signal.js';
 
 const tmpMat4 = new Mat4();
 
@@ -7,7 +8,7 @@ export class Euler extends Array {
     constructor(x = 0, y = x, z = x, order = 'YXZ') {
         super(x, y, z);
         this.order = order;
-        this.onChange = () => {};
+        this.onChange = new Signal();
         return this;
     }
 
@@ -25,17 +26,17 @@ export class Euler extends Array {
 
     set x(v) {
         this[0] = v;
-        this.onChange();
+        this.onChange.fire();
     }
 
     set y(v) {
         this[1] = v;
-        this.onChange();
+        this.onChange.fire();
     }
 
     set z(v) {
         this[2] = v;
-        this.onChange();
+        this.onChange.fire();
     }
 
     set(x, y = x, z = x) {
@@ -43,7 +44,7 @@ export class Euler extends Array {
         this[0] = x;
         this[1] = y;
         this[2] = z;
-        this.onChange();
+        this.onChange.fire();
         return this;
     }
 
@@ -51,19 +52,19 @@ export class Euler extends Array {
         this[0] = v[0];
         this[1] = v[1];
         this[2] = v[2];
-        this.onChange();
+        this.onChange.fire();
         return this;
     }
 
     reorder(order) {
         this.order = order;
-        this.onChange();
+        this.onChange.fire();
         return this;
     }
 
     fromRotationMatrix(m, order = this.order) {
         EulerFunc.fromRotationMatrix(this, m, order);
-        this.onChange();
+        this.onChange.fire();
         return this;
     }
 

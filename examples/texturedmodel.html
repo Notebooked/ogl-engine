@@ -8,7 +8,7 @@
             content="width=device-width, minimal-ui, viewport-fit=cover, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
         />
         <link rel="icon" type="image/png" href="assets/favicon.png" />
-
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
         <title>OGL • Torus</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
     </head>
@@ -65,7 +65,7 @@
                 const camera = new Camera({ fov: 45 });
                 camera.position.set(3, 1.5, 4);
                 camera.lookAt([1, 0.2, 0]);
-                camera.setParent(app);
+                camera.setParent(app.scene);
 
                 // Create controls and pass parameters
                 const controls = new Orbit(camera, {
@@ -96,10 +96,10 @@
 
                     mesh = new Mesh({ geometry, program });
                     mesh.position.set(0, 0, 0);
-                    mesh.setParent(app);
+                    mesh.setParent(app.scene);
                 }
 
-                app.update = (dt) => {
+                app.scene.update = (dt) => {
                     if (mesh) mesh.rotation.y -= 0.005;
                 }
                 app.mainloop();

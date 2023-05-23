@@ -8,46 +8,66 @@
             content="width=device-width, minimal-ui, viewport-fit=cover, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
         />
         <link rel="icon" type="image/png" href="assets/favicon.png" />
-
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
         <title>OGL Engine • Physics Demo</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
     </head>
     <body>
         <div class="Info">Physics Demo</div>
-        <script src="../src/physics/matter.min.js"></script>
         <script type="module">
-            // module aliases
-            var Engine = Matter.Engine,
-                Render = Matter.Render,
-                Runner = Matter.Runner,
-                Bodies = Matter.Bodies,
-                Composite = Matter.Composite;
+            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, Color, Transform } from '../src/index.mjs';
+            import { Rigidbody2D } from '../src/physics2d/Rigidbody2D.js';
 
-            // create an engine
-            var engine = Engine.create();
+            {
+                const app = new Game();
+                app.renderer.clearColor = new Color(0.1,0.1,0.2,1);
 
-            // create a renderer
-            var render = Render.create({
-                element: document.body,
-                engine: engine
-            });
+                app.addCanvasToPage();
 
-            // create two boxes and a ground
-            var boxA = Bodies.rectangle(400, 200, 80, 80);
-            var boxB = Bodies.rectangle(450, 50, 80, 80);
-            var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
+                app.renderer.dpr = 3;
 
-            // add all of the bodies to the world
-            Composite.add(engine.world, [boxA, boxB, ground]);
+                const camera = new Camera();
+                camera.position.set(0,0,30);
+                camera.setParent(app.scene);
 
-            // run the renderer
-            Render.run(render);
+                //const controls = new Orbit(camera);
+                //controls.setParent(camera);
 
-            // create runner
-            var runner = Runner.create();
+                const platform = new Rigidbody2D("platform");
+                platform.setParent(app.scene);
+                const test2 = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face.png'})});
+                test2.setParent(platform);
+                platform.scale = new Vec3(3,1,1);
+                platform.position = new Vec3(0,-3,0);
+                test2.name = "test";
+                platform.isStatic = true;
+                platform.setRectangleShape(3,1);
+                platform.rotation.z = 0.2
 
-            // run the engine
-            Runner.run(runner, engine);
+                const ball = new Rigidbody2D("ball");
+                ball.setParent(app.scene);
+                const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face - Copy.png'})});
+                test.setParent(ball);
+                ball.position = new Vec3(0,3,-1);
+                test.name = "test";
+                ball.setCircleShape(0.5);
+                ball.update = (dt) => {
+                    if (app.inputManager.getInput("Space")) {
+                        ball.velocity.y = 0.1;
+                    }
+                    if (app.inputManager.getInput("KeyA")) {
+                        ball.angularVelocity = 0.1;
+                    }
+                    if (app.inputManager.getInput("KeyD")) {
+                        ball.angularVelocity = -0.1;
+                    }
+                };
+                ball.friction = 1;
+
+                test.update = () => test.globalPosition.x = 2;
+
+                app.mainloop();
+            }
         </script>
     </body>
 </html>

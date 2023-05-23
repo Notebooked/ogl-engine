@@ -11,6 +11,7 @@
 
         <title>OGL • Torus</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
     </head>
     <body>
         <div class="Info">Torus</div>
@@ -58,7 +59,7 @@
 
             const camera = new Camera({ fov: 15 });
             camera.position.z = 15;
-            camera.setParent(app);
+            camera.setParent(app.scene);
 
             // Geometry is an indexed square, comprised of 4 vertices.
             const geometry = new Geometry({
@@ -77,24 +78,24 @@
 
             // gl.POINTS: draws 4 points (actually draws 6, with 2 duplicates due to the geometry indices)
             const points = new Mesh({ mode: gl.POINTS, geometry, program });
-            points.setParent(app);
+            points.setParent(app.scene);
             points.position.set(-1, 1, 0);
 
             // gl.LINES: draws 3 lines - a line between each pair of vertices.
             // Ideal use for separated lines.
             const lineStrip = new Mesh({ mode: gl.LINES, geometry, program });
-            lineStrip.setParent(app);
+            lineStrip.setParent(app.scene);
             lineStrip.position.set(1, 1, 0);
 
             // gl.LINE_LOOP: draws 6 lines (1 unavoidable overlap for squares).
             const lineLoop = new Mesh({ mode: gl.LINE_LOOP, geometry, program });
-            lineLoop.setParent(app);
+            lineLoop.setParent(app.scene);
             lineLoop.position.set(-1, -1, 0);
 
             // gl.TRIANGLES: draws a triangle between each set of 3 vertices.
             // Used as the default draw mode, so doesn't really need to be passed in as a param.
             const triangles = new Mesh({ mode: gl.TRIANGLES, geometry, program });
-            triangles.setParent(app);
+            triangles.setParent(app.scene);
             triangles.position.set(1, -1, 0);
 
             app.update = (dt) => {

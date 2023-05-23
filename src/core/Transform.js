@@ -17,20 +17,19 @@ export class Transform extends Node {
         this.matrixAutoUpdate = true;
 
         this.position = new Vec3();
-        this.quaternion = new Quat();
         this.scale = new Vec3(1);
-        this.rotation = new Euler();
-        this.up = new Vec3(0, 1, 0);
 
-        this.rotation.onChange = () => this.quaternion.fromEuler(this.rotation);
-        this.quaternion.onChange = () => this.rotation.fromQuaternion(this.quaternion);
+        this._rotation = new Euler();
+        this._quaternion = new Quat();
+        this._rotation.onChange.add(() => this._quaternion.fromEuler(this._rotation));
+        this._quaternion.onChange.add(() => this._rotation.fromQuaternion(this._quaternion));
     }
 
     updateMatrixWorld(force) {
         if (this.matrixAutoUpdate) this.updateMatrix();
         if (this.worldMatrixNeedsUpdate || force) {
-            if (this.parent === null) this.worldMatrix.copy(this.matrix);
-            else this.worldMatrix.multiply(this.parent.worldMatrix, this.matrix);
+            if (this.parent instanceof Transform) this.worldMatrix.multiply(this.parent.worldMatrix, this.matrix)
+            else this.worldMatrix.copy(this.matrix);
             this.worldMatrixNeedsUpdate = false;
             force = true;
         }
@@ -54,10 +53,44 @@ export class Transform extends Node {
         this.rotation.fromQuaternion(this.quaternion);
     }
 
-    lookAt(target, invert = false) {
-        if (invert) this.matrix.lookAt(this.position, target, this.up);
-        else this.matrix.lookAt(target, this.position, this.up);
+    lookAt(target, up = new Vec3(0, 1, 0), invert = false) {
+        if (invert) this.matrix.lookAt(this.position, target, up);
+        else this.matrix.lookAt(target, this.position, up);
         this.matrix.getRotation(this.quaternion);
         this.rotation.fromQuaternion(this.quaternion);
+    }
+
+    get rotation() {
+        return this._rotation;
+    }
+    set rotation(value) {
+        this._rotation.set(value);
+    }
+
+    get quaternion() {
+        return this._quaternion;
+    }
+    set quaternion(value) {
+        this._quaternion.set(value);
+    }
+
+    get globalPosition() {
+        var res = new Vec3();
+        this.worldMatrix.getTranslation(res);
+        return res;
+    }
+    get globalRotation() {
+        var res = new Vec3();
+        this.matrix.getRotation(res);
+        return res;
+    }
+    get globalScale() {
+        var res = new Vec3();
+        this.matrix.getScaling(res);
+        return res;
+    }
+
+    setGlobalTransform(m) {
+        this.matrix.multiply(this.worldMatrix.inverse(), m);
     }
 }

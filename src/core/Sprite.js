@@ -39,9 +39,21 @@ export class Sprite extends Mesh {
                     tMap: { value: texture },
                 },
                 cullFace: null,
+                transparent: true,
             }),
             geometry = new Plane({width:1,height:1})
         } = {}) {
         super({ geometry, program });
     }   
 }
+
+/*
+this.transparent = transparent;
+        this.cullFace = cullFace;
+        this.frontFace = frontFace;
+        this.depthTest = depthTest;
+        this.depthWrite = depthWrite;
+        this.depthFunc = depthFunc;
+        this.blendFunc = {};
+        this.blendEquation = {};
+*/

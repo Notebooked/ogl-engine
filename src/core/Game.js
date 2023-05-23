@@ -2,18 +2,22 @@ import { Renderer } from './Renderer.js';
 import { Camera } from './Camera.js';
 import { Transform } from './Transform.js';
 import { getGlContext } from './Canvas.js';
-
-import * as timer from '../util/timer.js';
+import { PhysicsEngine2D } from '../physics2d/PhysicsEngine2D.js';
+import { InputManager } from './InputManager.js';
 
 var then = 0;
 var dt = 0;
 
-export class Game extends Transform {
+export class Game {
     #time = 0.0;
-    constructor() {
-        super();
+    #scene = null;
+
+    constructor(scene = new Transform()) {
+        this.setScene(scene);
 
         this.renderer = new Renderer();
+        this.physicsEngine2D = new PhysicsEngine2D(this);
+        this.inputManager = new InputManager();
     }
 
     get time() {
@@ -23,10 +27,11 @@ export class Game extends Transform {
     addCanvasToPage() {
         document.body.appendChild(getGlContext().canvas);
     }
+
     resize() {
         const gl = getGlContext();
 
-        var camera = this.findFirstDescendant(null,Camera);
+        var camera = this.scene.findFirstDescendant(null,Camera);
         if (camera === null) {
             throw new Error("There is no Camera in the scene");
         }
@@ -34,21 +39,24 @@ export class Game extends Transform {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
     }
+
     render() {
-        var camera = this.findFirstDescendant(null,Camera);
+        var camera = this.scene.findFirstDescendant(null,Camera);
         if (camera === null) {
             throw new Error("There is no Camera in the scene");
         }
 
         this.resize();
 
-        this.renderer.render({ scene: this, camera });
+        this.renderer.render({ scene: this.scene, camera });
     }
+
     mainloop() {
-        this.broadcast('start');
+        this.scene.broadcast('start');
 
         requestAnimationFrame((now) => {this.loop(now);})
     }
+
     loop(now) {
         now *= 0.001;
         dt = now - then;
@@ -56,10 +64,20 @@ export class Game extends Transform {
 
         this.#time += dt;
 
-        this.broadcast('update',dt);
+        this.scene.broadcast('update',dt);
+
+        this.physicsEngine2D._update(dt);
 
         this.render();
         
         requestAnimationFrame((now) => {this.loop(now);})
+    }
+
+    get scene() {
+        return this.#scene;
+    }
+    setScene(scene) {
+        this.#scene = scene;
+        this.#scene.setGame(this);
     }
 }

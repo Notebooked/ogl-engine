@@ -1,8 +1,12 @@
 import * as Vec2Func from './functions/Vec2Func.js';
+import { Signal } from '../core/Signal.js';
 
 export class Vec2 extends Array {
     constructor(x = 0, y = x) {
         super(x, y);
+
+        this.onChange = new Signal();
+
         return this;
     }
 
@@ -16,49 +20,58 @@ export class Vec2 extends Array {
 
     set x(v) {
         this[0] = v;
+        this.onChange.fire();
     }
 
     set y(v) {
         this[1] = v;
+        this.onChange.fire();
     }
 
     set(x, y = x) {
         if (x.length) return this.copy(x);
         Vec2Func.set(this, x, y);
+        this.onChange.fire();
         return this;
     }
 
     copy(v) {
         Vec2Func.copy(this, v);
+        this.onChange.fire();
         return this;
     }
 
     add(va, vb) {
         if (vb) Vec2Func.add(this, va, vb);
         else Vec2Func.add(this, this, va);
+        this.onChange.fire();
         return this;
     }
 
     sub(va, vb) {
         if (vb) Vec2Func.subtract(this, va, vb);
         else Vec2Func.subtract(this, this, va);
+        this.onChange.fire();
         return this;
     }
 
     multiply(v) {
         if (v.length) Vec2Func.multiply(this, this, v);
         else Vec2Func.scale(this, this, v);
+        this.onChange.fire();
         return this;
     }
 
     divide(v) {
         if (v.length) Vec2Func.divide(this, this, v);
         else Vec2Func.scale(this, this, 1 / v);
+        this.onChange.fire();
         return this;
     }
 
     inverse(v = this) {
         Vec2Func.inverse(this, v);
+        this.onChange.fire();
         return this;
     }
 
@@ -83,6 +96,7 @@ export class Vec2 extends Array {
 
     negate(v = this) {
         Vec2Func.negate(this, v);
+        this.onChange.fire();
         return this;
     }
 
@@ -93,11 +107,13 @@ export class Vec2 extends Array {
 
     scale(v) {
         Vec2Func.scale(this, this, v);
+        this.onChange.fire();
         return this;
     }
 
     normalize() {
         Vec2Func.normalize(this, this);
+        this.onChange.fire();
         return this;
     }
 
@@ -111,16 +127,19 @@ export class Vec2 extends Array {
 
     applyMatrix3(mat3) {
         Vec2Func.transformMat3(this, this, mat3);
+        this.onChange.fire();
         return this;
     }
 
     applyMatrix4(mat4) {
         Vec2Func.transformMat4(this, this, mat4);
+        this.onChange.fire();
         return this;
     }
 
     lerp(v, a) {
         Vec2Func.lerp(this, this, v, a);
+        this.onChange.fire();
         return this;
     }
 
@@ -131,6 +150,7 @@ export class Vec2 extends Array {
     fromArray(a, o = 0) {
         this[0] = a[o];
         this[1] = a[o + 1];
+        this.onChange.fire();
         return this;
     }
 

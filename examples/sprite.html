@@ -8,14 +8,14 @@
             content="width=device-width, minimal-ui, viewport-fit=cover, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
         />
         <link rel="icon" type="image/png" href="assets/favicon.png" />
-
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
         <title>OGL Engine • Sprite Demo</title>
         <link href="../oglexamples/assets/main.css" rel="stylesheet" />
     </head>
     <body>
         <div class="Info">Sprite Demo</div>
         <script type="module">
-            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, InputManager } from '../src/index.mjs';
+            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, InputManager, Color, Transform } from '../src/index.mjs';
 
             class Player extends Sprite {
                 constructor(name,parent=null) {
@@ -57,6 +57,8 @@
 
             {
                 const app = new Game();
+                app.renderer.clearColor = new Color(0.1,0.1,0.2,1);
+
                 const gl = app.renderer.gl;
                 app.addCanvasToPage();
 
@@ -68,13 +70,11 @@
 
                 const inputManager = new InputManager("Input Manager");
                 inputManager.setParent(app);
-/*                 const orbit = new Orbit(camera);
-                orbit.setParent(camera); */
 
                 const player = new Player();
                 player.setParent(app);
 
-                const test = new Sprite({texture:TextureLoader.load({src:'assets/grimacing-face.png'})});
+                const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face.png'})});
                 test.setParent(player);
                 test.position = new Vec3(3,3,0);
 

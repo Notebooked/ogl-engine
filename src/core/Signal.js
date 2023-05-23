@@ -4,11 +4,11 @@ export class Signal {
         this.#funcs = funcs;
     }
     add(func) {
-        this.#funcs.add(func);
+        this.#funcs.push(func);
     }
-    fire() {
-        for (func in this.#funcs) {
-            func();
-        }
+    fire(...args) {
+        this.#funcs.forEach((func) => {
+            func(...args);
+        })
     }
 }

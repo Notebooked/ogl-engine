@@ -1,17 +1,46 @@
+import { Signal } from '../core/Signal.js';
+
 export class Node {
     constructor(name, parent = null) {
         this.name = name;
 
         this._parent = parent;
         this._children = [];
+
+        this._game = null;
+
+        this.parentChanged = new Signal();
+        this.gameTreeChanging = new Signal();
+        this.gameTreeChanged = new Signal();
     }
+
+    get game() {
+        return this._game;
+    }
+    setGame(game) {
+        this._game = game;
+    }
+
     get parent() {
         return this._parent;
     }
+    set parent(value) {
+        this.setParent(value);
+    }
     setParent(parent, notifyParent = true) {
-        if (this._parent && parent !== this._parent) this._parent.removeChild(this, false);
-        this._parent = parent;
-        if (notifyParent && parent) parent.addChild(this, false);
+        if (this._parent !== parent) {
+            if (this._parent) this._parent.removeChild(this, false);
+
+            this._parent = parent;
+            if (this._parent instanceof Node) {
+                var oldGame = this._game;
+                this._game = parent.game;
+                this.gameTreeChanged.fire(oldGame = oldGame);
+            }
+            else this._game = null;
+
+            if (notifyParent && parent instanceof Node) parent.addChild(this, false);
+        }
     }
 
     get children() {
@@ -71,6 +100,26 @@ export class Node {
             }
         })
         return null;
+    }
+
+    findDescendants(name = null, type = null) {
+        var res = [];
+        this.traverse((child) => {
+            var isChild = true;
+            if (name !== null && child.name !== name) {
+                isChild = false;
+            }
+            if (type !== null && !(child instanceof type)) {
+                isChild = false;
+            }
+            if (isChild === true) { res.push(child) }
+            return false;
+        })
+        this._children.forEach((child) => {
+            var childRes = child.findDescendants(name, type);
+            res.push(...childRes);
+        })
+        return res;
     }
 
     traverse(callback) {

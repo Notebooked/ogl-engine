@@ -1,4 +1,27 @@
-make transform take into account non transform parents
+pause game when on another tab
+
+transform position and scale getters and setters
+
+move scene stuff from renderer to game
+
+make line renderer and polygon/shape renderer
+
+make physics shape update and stuff and also make it size with global transform
+
+setter functions for position rotation and scale in transform
+
+OGL ISSUE: transparency not working on same z-index
+
+standardize getter and setter functions
+
+make onChange signal for all math data types like matrices, vectors, and color
+
+make transform take into account non transform parents (search for transform parent)
+make sure updatematrixworld is called on every transform regardless of parent
+
+typescript veresion
+
+up left forward and stuff for transform
 
 improve input manager
 
@@ -8,3 +31,6 @@ fix aspect ratio for camera to adjust for height and width (preserve height, pre
 do stuff involving constructor argumens for node and gl
 
 make orbit an actual class and automatically link parent as camera
+fix orbit
+
+unity uses circle shape of x width of transform

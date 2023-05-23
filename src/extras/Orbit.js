@@ -43,76 +43,40 @@ export class Orbit extends Node {
         this.target = target;
         this.zoomStyle = zoomStyle;
 
+        this.object = object;
+
         // Catch attempts to disable - set to 1 so has no effect
-        ease = ease || 1;
-        inertia = inertia || 0;
+        this.ease = ease || 1;
+        this.inertia = inertia || 0;
 
         this.minDistance = minDistance;
         this.maxDistance = maxDistance;
 
         // current position in sphericalTarget coordinates
-        const sphericalDelta = { radius: 1, phi: 0, theta: 0 };
-        const sphericalTarget = { radius: 1, phi: 0, theta: 0 };
-        const spherical = { radius: 1, phi: 0, theta: 0 };
-        const panDelta = new Vec3();
+        this.sphericalDelta = { radius: 1, phi: 0, theta: 0 };
+        this.sphericalTarget = { radius: 1, phi: 0, theta: 0 };
+        this.spherical = { radius: 1, phi: 0, theta: 0 };
+        this.panDelta = new Vec3();
+
+        this.autoRotate = autoRotate;
+        this.minAzimuthAngle = minAzimuthAngle;
+        this.maxAzimuthAngle = maxAzimuthAngle;
+        this.minPolarAngle = minPolarAngle;
+        this.maxPolarAngle = maxPolarAngle;
 
         // Grab initial position values
-        const offset = new Vec3();
-        offset.copy(object.position).sub(this.target);
-        spherical.radius = sphericalTarget.radius = offset.distance();
-        spherical.theta = sphericalTarget.theta = Math.atan2(offset.x, offset.z);
-        spherical.phi = sphericalTarget.phi = Math.acos(Math.min(Math.max(offset.y / sphericalTarget.radius, -1), 1));
-
-        this.offset = offset;
-
-        this.update = () => {
-            if (autoRotate) {
-                handleAutoRotate();
-            }
-
-            // apply delta
-            sphericalTarget.radius *= sphericalDelta.radius;
-            sphericalTarget.theta += sphericalDelta.theta;
-            sphericalTarget.phi += sphericalDelta.phi;
-
-            // apply boundaries
-            sphericalTarget.theta = Math.max(minAzimuthAngle, Math.min(maxAzimuthAngle, sphericalTarget.theta));
-            sphericalTarget.phi = Math.max(minPolarAngle, Math.min(maxPolarAngle, sphericalTarget.phi));
-            sphericalTarget.radius = Math.max(this.minDistance, Math.min(this.maxDistance, sphericalTarget.radius));
-
-            // ease values
-            spherical.phi += (sphericalTarget.phi - spherical.phi) * ease;
-            spherical.theta += (sphericalTarget.theta - spherical.theta) * ease;
-            spherical.radius += (sphericalTarget.radius - spherical.radius) * ease;
-
-            // apply pan to target. As offset is relative to target, it also shifts
-            this.target.add(panDelta);
-
-            // apply rotation to offset
-            let sinPhiRadius = spherical.radius * Math.sin(Math.max(0.000001, spherical.phi));
-            offset.x = sinPhiRadius * Math.sin(spherical.theta);
-            offset.y = spherical.radius * Math.cos(spherical.phi);
-            offset.z = sinPhiRadius * Math.cos(spherical.theta);
-
-            // Apply updated values to object
-            object.position.copy(this.target).add(offset);
-            object.lookAt(this.target);
-
-            // Apply inertia to values
-            sphericalDelta.theta *= inertia;
-            sphericalDelta.phi *= inertia;
-            panDelta.multiply(inertia);
-
-            // Reset scale every frame to avoid applying scale multiple times
-            sphericalDelta.radius = 1;
-        };
+        this.offset = new Vec3();
+        this.offset.copy(object.position).sub(this.target);
+        this.spherical.radius = this.sphericalTarget.radius = this.offset.distance();
+        this.spherical.theta = this.sphericalTarget.theta = Math.atan2(this.offset.x, this.offset.z);
+        this.spherical.phi = this.sphericalTarget.phi = Math.acos(Math.min(Math.max(this.offset.y / this.sphericalTarget.radius, -1), 1));
 
         // Updates internals with new position
         this.forcePosition = () => {
-            offset.copy(object.position).sub(this.target);
-            spherical.radius = sphericalTarget.radius = offset.distance();
-            spherical.theta = sphericalTarget.theta = Math.atan2(offset.x, offset.z);
-            spherical.phi = sphericalTarget.phi = Math.acos(Math.min(Math.max(offset.y / sphericalTarget.radius, -1), 1));
+            this.offset.copy(object.position).sub(this.target);
+            this.spherical.radius = this.sphericalTarget.radius = this.offset.distance();
+            this.spherical.theta = this.sphericalTarget.theta = Math.atan2(this.offset.x, this.offset.z);
+            this.spherical.phi = this.sphericalTarget.phi = Math.acos(Math.min(Math.max(this.offset.y / this.sphericalTarget.radius, -1), 1));
             object.lookAt(this.target);
         };
 
@@ -126,20 +90,20 @@ export class Orbit extends Node {
         let state = STATE.NONE;
         this.mouseButtons = { ORBIT: 0, ZOOM: 1, PAN: 2 };
 
-        function getZoomScale() {
+        const getZoomScale = () => {
             return Math.pow(0.95, zoomSpeed);
         }
 
-        function panLeft(distance, m) {
+        const panLeft = (distance, m) => {
             tempVec3.set(m[0], m[1], m[2]);
             tempVec3.multiply(-distance);
-            panDelta.add(tempVec3);
+            this.panDelta.add(tempVec3);
         }
 
-        function panUp(distance, m) {
+        const panUp = (distance, m) => {
             tempVec3.set(m[4], m[5], m[6]);
             tempVec3.multiply(distance);
-            panDelta.add(tempVec3);
+            this.panDelta.add(tempVec3);
         }
 
         const pan = (deltaX, deltaY) => {
@@ -152,7 +116,7 @@ export class Orbit extends Node {
         };
 
         const dolly = (dollyScale) => {
-            if (this.zoomStyle === 'dolly') sphericalDelta.radius /= dollyScale;
+            if (this.zoomStyle === 'dolly') this.sphericalDelta.radius /= dollyScale;
             else {
                 object.fov /= dollyScale;
                 if (object.type === 'orthographic') object.orthographic();
@@ -160,21 +124,21 @@ export class Orbit extends Node {
             }
         };
 
-        function handleAutoRotate() {
+        const handleAutoRotate = () => {
             const angle = ((2 * Math.PI) / 60 / 60) * autoRotateSpeed;
-            sphericalDelta.theta -= angle;
+            this.sphericalDelta.theta -= angle;
         }
 
-        function handleMoveRotate(x, y) {
+        const handleMoveRotate = (x, y) => {
             tempVec2a.set(x, y);
             tempVec2b.sub(tempVec2a, rotateStart).multiply(rotateSpeed);
             let el = element === document ? document.body : element;
-            sphericalDelta.theta -= (2 * Math.PI * tempVec2b.x) / el.clientHeight;
-            sphericalDelta.phi -= (2 * Math.PI * tempVec2b.y) / el.clientHeight;
+            this.sphericalDelta.theta -= (2 * Math.PI * tempVec2b.x) / el.clientHeight;
+            this.sphericalDelta.phi -= (2 * Math.PI * tempVec2b.y) / el.clientHeight;
             rotateStart.copy(tempVec2a);
         }
 
-        function handleMouseMoveDolly(e) {
+        const handleMouseMoveDolly = (e) => {
             tempVec2a.set(e.clientX, e.clientY);
             tempVec2b.sub(tempVec2a, dollyStart);
             if (tempVec2b.y > 0) {
@@ -185,14 +149,14 @@ export class Orbit extends Node {
             dollyStart.copy(tempVec2a);
         }
 
-        function handleMovePan(x, y) {
+        const handleMovePan = (x, y) => {
             tempVec2a.set(x, y);
             tempVec2b.sub(tempVec2a, panStart).multiply(panSpeed);
             pan(tempVec2b.x, tempVec2b.y);
             panStart.copy(tempVec2a);
         }
 
-        function handleTouchStartDollyPan(e) {
+        const handleTouchStartDollyPan = (e) => {
             if (enableZoom) {
                 let dx = e.touches[0].pageX - e.touches[1].pageX;
                 let dy = e.touches[0].pageY - e.touches[1].pageY;
@@ -207,7 +171,7 @@ export class Orbit extends Node {
             }
         }
 
-        function handleTouchMoveDollyPan(e) {
+        const handleTouchMoveDollyPan = (e) => {
             if (enableZoom) {
                 let dx = e.touches[0].pageX - e.touches[1].pageX;
                 let dy = e.touches[0].pageY - e.touches[1].pageY;
@@ -359,5 +323,48 @@ export class Orbit extends Node {
         };
 
         addHandlers();
+    }
+    update() {
+        if (this.autoRotate) {
+            handleAutoRotate();
+        }
+
+        // apply delta
+        this.sphericalTarget.radius *= this.sphericalDelta.radius;
+        this.sphericalTarget.theta += this.sphericalDelta.theta;
+        this.sphericalTarget.phi += this.sphericalDelta.phi;
+
+        // apply boundaries
+        this.sphericalTarget.theta = Math.max(this.minAzimuthAngle, Math.min(this.maxAzimuthAngle, this.sphericalTarget.theta));
+        this.sphericalTarget.phi = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.sphericalTarget.phi));
+        this.sphericalTarget.radius = Math.max(this.minDistance, Math.min(this.maxDistance, this.sphericalTarget.radius));
+
+        // ease values
+        this.spherical.phi += (this.sphericalTarget.phi - this.spherical.phi) * this.ease;
+        this.spherical.theta += (this.sphericalTarget.theta - this.spherical.theta) * this.ease;
+        this.spherical.radius += (this.sphericalTarget.radius - this.spherical.radius) * this.ease;
+
+        // apply pan to target. As offset is relative to target, it also shifts
+        this.target.add(this.panDelta);
+
+        // apply rotation to offset
+        let sinPhiRadius = this.spherical.radius * Math.sin(Math.max(0.000001, this.spherical.phi));
+        this.offset.x = sinPhiRadius * Math.sin(this.spherical.theta);
+        this.offset.y = this.spherical.radius * Math.cos(this.spherical.phi);
+        this.offset.z = sinPhiRadius * Math.cos(this.spherical.theta);
+
+        // Apply updated values to parent camera
+        let camera = this.parent;
+        if (!camera instanceof Camera) throw new Error("Parent of Orbit must be a Camera");
+        camera.position.copy(this.target).add(this.offset);
+        camera.lookAt(this.target);
+
+        // Apply inertia to values
+        this.theta *= this.inertia;
+        this.sphericalDelta.phi *= this.inertia;
+        this.panDelta.multiply(this.inertia);
+
+        // Reset scale every frame to avoid applying scale multiple times
+        this.sphericalDelta.radius = 1;
     }
 }

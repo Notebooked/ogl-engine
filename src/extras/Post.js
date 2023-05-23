@@ -12,6 +12,7 @@ export class Post {
             width,
             height,
             dpr,
+            gl = getGlContext(),
             wrapS = gl.CLAMP_TO_EDGE,
             wrapT = gl.CLAMP_TO_EDGE,
             minFilter = gl.LINEAR,
@@ -20,7 +21,7 @@ export class Post {
             targetOnly = null,
         } = {}
     ) {
-        this.gl = getGlContext();
+        this.gl = gl;
 
         this.options = { wrapS, wrapT, minFilter, magFilter };
 
