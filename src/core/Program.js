@@ -88,7 +88,6 @@ export class Program {
             const split = uniform.name.match(/(\w+)/g);
 
             uniform.uniformName = split[0];
-
             uniform.nameComponents = split.slice(1);
         }
 
