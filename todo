@@ -12,6 +12,8 @@ setter functions for position rotation and scale in transform
 
 OGL ISSUE: transparency not working on same z-index
 
+preload assets or fix lag at start or something 
+
 standardize getter and setter functions
 
 make onChange signal for all math data types like matrices, vectors, and color
