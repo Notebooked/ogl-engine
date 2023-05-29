@@ -9,9 +9,9 @@ export class Node {
 
         this._game = null;
 
-        this.parentChanged = new Signal();
-        this.gameTreeChanging = new Signal();
-        this.gameTreeChanged = new Signal();
+        this.parentChanged = new Signal(); //doesnt even work
+        this.gameTreeChanging = new Signal(); //put this in setgame
+        this.gameTreeChanged = new Signal(); //and this
     }
 
     get game() {

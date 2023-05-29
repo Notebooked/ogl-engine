@@ -50,10 +50,10 @@ export class Camera extends Transform {
         return this;
     }
 
-    updateMatrixWorld() {
-        super.updateMatrixWorld();
-        this.viewMatrix.inverse(this.worldMatrix);
-        this.worldMatrix.getTranslation(this.worldPosition);
+    updateWorldMatrix() {
+        super.updateWorldMatrix();
+        this.viewMatrix.inverse(this._worldMatrix);
+        this._worldMatrix.getTranslation(this.worldPosition);
 
         // used for sorting
         this.projectionViewMatrix.multiply(this.projectionMatrix, this.viewMatrix);

@@ -19,36 +19,42 @@
 
             class Player extends Sprite {
                 constructor(name,parent=null) {
-                    const spriteTexture = TextureLoader.load({src: 'assets/grimacing-face.png'})
+                    const spriteTexture = TextureLoader.load({src: 'assets/grimacing-face - Copy.png'})
                     super({texture: spriteTexture})
                     this.scale = new Vec3(0.5,0.5,1);
 
                     this.speed = 4;
                 }
                 update(dt) {
-                    if (this.root.getNode("Input Manager").getInput("KeyA")) {
+                    if (this.game.inputManager.getInput("KeyA")) {
                         this.position.x -= this.speed * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("KeyD")) {
+                    if (this.game.inputManager.getInput("KeyD")) {
                         this.position.x += this.speed * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("KeyS")) {
+                    if (this.game.inputManager.getInput("KeyS")) {
                         this.position.y -= this.speed * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("KeyW")) {
+                    if (this.game.inputManager.getInput("KeyW")) {
                         this.position.y += this.speed * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("ArrowLeft")) {
+                    if (this.game.inputManager.getInput("KeyQ")) {
+                        this.position.z -= this.speed * dt;
+                    }
+                    if (this.game.inputManager.getInput("KeyE")) {
+                        this.position.z += this.speed * dt;
+                    }
+                    if (this.game.inputManager.getInput("ArrowLeft")) {
                         this.rotation.z += 2 * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("ArrowRight")) {
+                    if (this.game.inputManager.getInput("ArrowRight")) {
                         this.rotation.z -= 2 * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("ArrowUp")) {
+                    if (this.game.inputManager.getInput("ArrowUp")) {
                         this.scale.x += 1.2 * dt;
                         this.scale.y += 1.2 * dt;
                     }
-                    if (this.root.getNode("Input Manager").getInput("ArrowDown")) {
+                    if (this.game.inputManager.getInput("ArrowDown")) {
                         this.scale.x -= 1.2 * dt;
                         this.scale.y -= 1.2 * dt;
                     }
@@ -59,24 +65,22 @@
                 const app = new Game();
                 app.renderer.clearColor = new Color(0.1,0.1,0.2,1);
 
-                const gl = app.renderer.gl;
                 app.addCanvasToPage();
-
                 app.renderer.dpr = 3;
 
                 const camera = new Camera();
                 camera.position.set(0,0,10);
-                camera.setParent(app);
-
-                const inputManager = new InputManager("Input Manager");
-                inputManager.setParent(app);
+                camera.setParent(app.scene);
+                camera.name = "camera";
 
                 const player = new Player();
-                player.setParent(app);
+                player.setParent(app.scene);
+                player.name = "plaer";
 
-                const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face.png'})});
+                const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face - Copy.png'})});
                 test.setParent(player);
                 test.position = new Vec3(3,3,0);
+                test.name = "test";
 
                 app.mainloop();
             }

@@ -16,6 +16,10 @@ preload assets or fix lag at start or something
 
 standardize getter and setter functions
 
+standardize naming conventions
+
+make sure game property of transform is gaming
+
 make onChange signal for all math data types like matrices, vectors, and color
 
 make transform take into account non transform parents (search for transform parent)

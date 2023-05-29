@@ -4,7 +4,7 @@ import { Signal } from '../core/Signal.js';
 
 const tmpMat4 = new Mat4();
 
-export class Euler extends Array {
+export class Euler extends Array { // WHY CANT EURLER BE SUBCLAS VEC3 
     constructor(x = 0, y = x, z = x, order = 'YXZ') {
         super(x, y, z);
         this.order = order;
@@ -70,13 +70,14 @@ export class Euler extends Array {
 
     fromQuaternion(q, order = this.order) {
         tmpMat4.fromQuaternion(q);
-        return this.fromRotationMatrix(tmpMat4, order);
+        //this.onChange.fire(); //LITERALLY JUST FIRE IT YOU MORON atually no we dont havbe to fire it becayse fromRotationMatrix does itc
+        return this.fromRotationMatrix(tmpMat4, order); // this should fire onchange because it actually affects this matrix
     }
 
     fromArray(a, o = 0) {
         this[0] = a[o];
         this[1] = a[o + 1];
-        this[2] = a[o + 2];
+        this[2] = a[o + 2]; // SHOUDL ONGANGE!?????
         return this;
     }
 

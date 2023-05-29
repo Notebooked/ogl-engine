@@ -1,3 +1,4 @@
+import { Signal } from '../core/Signal.js';
 import * as Mat4Func from './functions/Mat4Func.js';
 
 export class Mat4 extends Array {
@@ -20,6 +21,9 @@ export class Mat4 extends Array {
         m33 = 1
     ) {
         super(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+
+        this.onChange = new Signal();
+
         return this;
     }
 
@@ -41,50 +45,60 @@ export class Mat4 extends Array {
 
     set x(v) {
         this[12] = v;
+        this.onChange.fire();
     }
 
     set y(v) {
         this[13] = v;
+        this.onChange.fire();
     }
 
     set z(v) {
         this[14] = v;
+        this.onChange.fire();
     }
 
     set w(v) {
         this[15] = v;
+        this.onChange.fire();
     }
 
     set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
         if (m00.length) return this.copy(m00);
         Mat4Func.set(this, m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+        this.onChange.fire();
         return this;
     }
 
     translate(v, m = this) {
         Mat4Func.translate(this, m, v);
+        this.onChange.fire();
         return this;
     }
 
     rotate(v, axis, m = this) {
         Mat4Func.rotate(this, m, v, axis);
+        this.onChange.fire();
         return this;
     }
 
     scale(v, m = this) {
         Mat4Func.scale(this, m, typeof v === 'number' ? [v, v, v] : v);
+        this.onChange.fire();
         return this;
     }
 
     add(ma, mb) {
         if (mb) Mat4Func.add(this, ma, mb);
         else Mat4Func.add(this, this, ma);
+        this.onChange.fire();
         return this;
     }
 
     sub(ma, mb) {
         if (mb) Mat4Func.subtract(this, ma, mb);
         else Mat4Func.subtract(this, this, ma);
+        this.onChange.fire();
         return this;
     }
 
@@ -96,31 +110,37 @@ export class Mat4 extends Array {
         } else {
             Mat4Func.multiply(this, this, ma);
         }
+        this.onChange.fire();
         return this;
     }
 
     identity() {
         Mat4Func.identity(this);
+        this.onChange.fire();
         return this;
     }
 
     copy(m) {
         Mat4Func.copy(this, m);
+        this.onChange.fire();
         return this;
     }
 
     fromPerspective({ fov, aspect, near, far } = {}) {
         Mat4Func.perspective(this, fov, aspect, near, far);
+        this.onChange.fire();
         return this;
     }
 
     fromOrthogonal({ left, right, bottom, top, near, far }) {
         Mat4Func.ortho(this, left, right, bottom, top, near, far);
+        this.onChange.fire();
         return this;
     }
 
     fromQuaternion(q) {
         Mat4Func.fromQuat(this, q);
+        this.onChange.fire();
         return this;
     }
 
@@ -128,16 +148,19 @@ export class Mat4 extends Array {
         this.x = v[0];
         this.y = v[1];
         this.z = v[2];
+        this.onChange.fire();
         return this;
     }
 
     inverse(m = this) {
         Mat4Func.invert(this, m);
+        this.onChange.fire();
         return this;
     }
 
     compose(q, pos, scale) {
         Mat4Func.fromRotationTranslationScale(this, q, pos, scale);
+        this.onChange.fire();
         return this;
     }
 
@@ -162,6 +185,7 @@ export class Mat4 extends Array {
 
     lookAt(eye, target, up) {
         Mat4Func.targetTo(this, eye, target, up);
+        this.onChange.fire();
         return this;
     }
 
@@ -186,6 +210,7 @@ export class Mat4 extends Array {
         this[13] = a[o + 13];
         this[14] = a[o + 14];
         this[15] = a[o + 15];
+        this.onChange.fire();
         return this;
     }
 

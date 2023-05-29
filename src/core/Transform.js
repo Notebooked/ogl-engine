@@ -12,52 +12,105 @@ export class Transform extends Node {
 
         this.visible = true;
 
-        this.matrix = new Mat4();
-        this.worldMatrix = new Mat4();
-        this.matrixAutoUpdate = true;
+        //to prevent circular signals from existing
+        //this happened with original ogl, where rotation properties updated off eachother
+        //and there was no onchange being called on fromquaternion or fromeuler (thats stupid)
+        this._shouldUpdateFromSignal = true;
 
-        this.position = new Vec3();
-        this.scale = new Vec3(1);
+        this._matrix = new Mat4();
+        this._matrix.onChange.add(() => {
+            if (this._shouldUpdateFromSignal) {
+                this._shouldUpdateFromSignal = false;
+
+                this.decompose();
+
+                this._shouldUpdateFromSignal = true;
+            }
+        });
+
+        this._worldMatrix = new Mat4();
+
+        this._position = new Vec3();
+        this._position.onChange.add(() => {
+            if (this._shouldUpdateFromSignal) {
+                this._shouldUpdateFromSignal = false;
+
+                this.updateMatrix();
+
+                this._shouldUpdateFromSignal = true;
+            }
+        });
 
         this._rotation = new Euler();
         this._quaternion = new Quat();
-        this._rotation.onChange.add(() => this._quaternion.fromEuler(this._rotation));
-        this._quaternion.onChange.add(() => this._rotation.fromQuaternion(this._quaternion));
+        this._rotation.onChange.add(() => {
+            if (this._shouldUpdateFromSignal) {
+                this._shouldUpdateFromSignal = false;
+
+                this._quaternion.fromEuler(this._rotation);
+                this.updateMatrix();
+
+                this._shouldUpdateFromSignal = true;
+            }
+        });
+        this._quaternion.onChange.add(() => {
+            if (this._shouldUpdateFromSignal) {
+                this._shouldUpdateFromSignal = false;
+
+                this._rotation.fromQuaternion(this._quaternion); //yeah i dont know about this one (what is a full rotation)
+                this.updateMatrix();
+
+                this._shouldUpdateFromSignal = true;
+            }
+        });
+
+        this._scale = new Vec3(1);
+        this._scale.onChange.add(() => {
+            if (this._shouldUpdateFromSignal) {
+                this._shouldUpdateFromSignal = false;
+
+                this.updateMatrix();
+
+                this._shouldUpdateFromSignal = true;
+            }
+        });
     }
 
-    updateMatrixWorld(force) {
-        if (this.matrixAutoUpdate) this.updateMatrix();
-        if (this.worldMatrixNeedsUpdate || force) {
-            if (this.parent instanceof Transform) this.worldMatrix.multiply(this.parent.worldMatrix, this.matrix)
-            else this.worldMatrix.copy(this.matrix);
-            this.worldMatrixNeedsUpdate = false;
-            force = true;
-        }
-
-        for (let i = 0, l = this.children.length; i < l; i++) {
-            if (this.children[i] instanceof Transform) {
-                this.children[i].updateMatrixWorld(force);
-            }
-        }
+    updateWorldMatrix() { // fix stupid name
+        if (this.parent instanceof Transform) this._worldMatrix.multiply(this.parent.worldMatrix, this._matrix);
+        else this._worldMatrix.copy(this._matrix);
     }
 
     updateMatrix() {
         this.matrix.compose(this.quaternion, this.position, this.scale);
-        this.worldMatrixNeedsUpdate = true;
     }
 
     decompose() {
-        this.matrix.getTranslation(this.position);
-        this.matrix.getRotation(this.quaternion);
-        this.matrix.getScaling(this.scale);
-        this.rotation.fromQuaternion(this.quaternion);
+        this.matrix.getTranslation(this._position); // set up onChange for these functions
+        this.matrix.getRotation(this._quaternion);
+        this.matrix.getScaling(this._scale);
+        this.rotation.fromQuaternion(this._quaternion);
     }
 
-    lookAt(target, up = new Vec3(0, 1, 0), invert = false) {
+    lookAt(target, up = new Vec3(0, 1, 0), invert = false) { //should lookAt be using globalmatrix or not???
         if (invert) this.matrix.lookAt(this.position, target, up);
         else this.matrix.lookAt(target, this.position, up);
         this.matrix.getRotation(this.quaternion);
-        this.rotation.fromQuaternion(this.quaternion);
+        this.rotation.fromQuaternion(this.quaternion); // this line necessary?
+    }
+
+    get matrix() {
+        return this._matrix;
+    }
+    set matrix(value) {
+        this._matrix.set(value);
+    }
+
+    get position() {
+        return this._position;
+    }
+    set position(value) {
+        this._position.set(value);
     }
 
     get rotation() {
@@ -74,23 +127,28 @@ export class Transform extends Node {
         this._quaternion.set(value);
     }
 
-    get globalPosition() {
-        var res = new Vec3();
-        this.worldMatrix.getTranslation(res);
-        return res;
+    get scale() {
+        return this._scale;
     }
-    get globalRotation() {
-        var res = new Vec3();
-        this.matrix.getRotation(res);
-        return res;
-    }
-    get globalScale() {
-        var res = new Vec3();
-        this.matrix.getScaling(res);
-        return res;
+    set scale(value) {
+        this._scale.set(value);
     }
 
-    setGlobalTransform(m) {
-        this.matrix.multiply(this.worldMatrix.inverse(), m);
+    get worldMatrix() {
+        this.updateWorldMatrix();
+        return this._worldMatrix;
+    }
+    set worldMatrix(value) {
+        //this.updateWorldMatrix(); dont think you need this becayse your setting the whole thing
+        this._worldMatrix.set(value);
+    }
+
+    // set global variables as underscore properties
+    get globalPosition() { //using standard naming, maybe change worldmatrix to globalmtx
+        var res = new Vec3();
+
+        this._worldMatrix.getTranslation(res);
+
+        return res;
     }
 }

@@ -349,11 +349,11 @@ export class Renderer {
             );
         }
 
-        // updates all scene graph matrices
-        if (update) scene.updateMatrixWorld();
+        // updates all scene graph matrices TURNED OFF FOR GETTER AND SETTER TRANSFORM TESTING
+        //if (update) scene.updateMatrixWorld();
 
         // Update camera separately, in case not in scene graph
-        if (camera) camera.updateMatrixWorld();
+        if (camera) camera.updateWorldMatrix();
 
         // Get render list - entails culling and sorting
         const renderList = this.getRenderList({ scene, camera, frustumCull, sort });
