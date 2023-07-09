@@ -37,7 +37,13 @@ export class Game {
         }
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+        var aspect = gl.canvas.width / gl.canvas.height;
+        if (camera.type === "perspective") {
+            camera.perspective({ aspect });
+        }
+        else {
+            camera.orthographic({ left: -gl.canvas.width, right: gl.canvas.width, top: gl.canvas.height, bottom: -gl.canvas.height, zoom: 1000 });
+        }
     }
 
     render() {
@@ -64,11 +70,14 @@ export class Game {
 
         this.#time += dt;
 
+        console.log("start");
+
         this.scene.broadcast('update',dt);
 
         this.physicsEngine2D._update(dt);
 
         this.render();
+        console.log("RENDEREWR")
         
         requestAnimationFrame((now) => {this.loop(now);})
     }

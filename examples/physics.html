@@ -48,7 +48,7 @@
                 ball.setParent(app.scene);
                 const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face - Copy.png'})});
                 test.setParent(ball);
-                ball.position = new Vec3(0,3,-1);
+                ball.position = new Vec3(0,10000,-1);
                 test.name = "test";
                 ball.setCircleShape(0.5);
                 ball.update = (dt) => {

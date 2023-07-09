@@ -4,7 +4,12 @@ import { Quat } from '../math/Quat.js';
 import { Mat4 } from '../math/Mat4.js';
 import { Euler } from '../math/Euler.js';
 
-//TODO: add directions, clean up visible
+//TODO: add directions, clean up visible, naming of functions and variables
+
+//to prevent circular signals from existing
+//this happened with original ogl, where rotation properties updated off eachother
+//and there was no onchange being called on fromquaternion or fromeuler (thats stupid)
+var shouldUpdateFromSignal = true;
 
 export class Transform extends Node {
     constructor(name, parent = null) {
@@ -12,91 +17,186 @@ export class Transform extends Node {
 
         this.visible = true;
 
-        //to prevent circular signals from existing
-        //this happened with original ogl, where rotation properties updated off eachother
-        //and there was no onchange being called on fromquaternion or fromeuler (thats stupid)
-        this._shouldUpdateFromSignal = true;
-
+        //LOCAL MATRIX
         this._matrix = new Mat4();
         this._matrix.onChange.add(() => {
-            if (this._shouldUpdateFromSignal) {
-                this._shouldUpdateFromSignal = false;
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
 
-                this.decompose();
+                this.decomposeLocal();
+                this.updateWorldMatrix();
 
-                this._shouldUpdateFromSignal = true;
+                shouldUpdateFromSignal = true;
             }
         });
 
-        this._worldMatrix = new Mat4();
-
         this._position = new Vec3();
         this._position.onChange.add(() => {
-            if (this._shouldUpdateFromSignal) {
-                this._shouldUpdateFromSignal = false;
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
 
-                this.updateMatrix();
+                this.composeMatrix();
 
-                this._shouldUpdateFromSignal = true;
+                shouldUpdateFromSignal = true;
             }
         });
 
         this._rotation = new Euler();
         this._quaternion = new Quat();
         this._rotation.onChange.add(() => {
-            if (this._shouldUpdateFromSignal) {
-                this._shouldUpdateFromSignal = false;
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
 
                 this._quaternion.fromEuler(this._rotation);
-                this.updateMatrix();
+                this.composeMatrix();
 
-                this._shouldUpdateFromSignal = true;
+                shouldUpdateFromSignal = true;
             }
         });
         this._quaternion.onChange.add(() => {
-            if (this._shouldUpdateFromSignal) {
-                this._shouldUpdateFromSignal = false;
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
 
-                this._rotation.fromQuaternion(this._quaternion); //yeah i dont know about this one (what is a full rotation)
-                this.updateMatrix();
+                this._rotation.fromQuaternion(this._quaternion); //yeah i dont know about this one (what is a full rotation) 2pi you idiot
+                this.composeMatrix();
 
-                this._shouldUpdateFromSignal = true;
+                shouldUpdateFromSignal = true;
             }
         });
 
         this._scale = new Vec3(1);
         this._scale.onChange.add(() => {
-            if (this._shouldUpdateFromSignal) {
-                this._shouldUpdateFromSignal = false;
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
 
-                this.updateMatrix();
+                this.composeMatrix();
 
-                this._shouldUpdateFromSignal = true;
+                shouldUpdateFromSignal = true;
+            }
+        });
+
+        // WORLD MATRIX
+        this._worldMatrix = new Mat4();
+        this._worldMatrix.onChange.add(() => {
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
+
+                this.decomposeWorld();
+                this.updateLocalMatrix();
+
+                shouldUpdateFromSignal = true;
+            }
+        });
+
+        this._globalPosition = new Vec3();
+        this._globalPosition.onChange.add(() => {
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
+
+                this.composeWorldMatrix();
+                this.updateLocalMatrix();
+
+                shouldUpdateFromSignal = true;
+            }
+        });
+
+        this._globalRotation = new Euler();
+        this._globalQuaternion = new Quat();
+        this._globalRotation.onChange.add(() => {
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
+
+                this._globalQuaternion.fromEuler(this._rotation);
+                this.composeWorldMatrix();
+                this.updateLocalMatrix();
+
+                shouldUpdateFromSignal = true;
+            }
+        });
+        this._globalQuaternion.onChange.add(() => {
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
+
+                this._globalRotation.fromQuaternion(this._quaternion); //yeah i dont know about this one (what is a full rotation) 2pi you idiot
+                this.composeWorldMatrix();
+                this.updateLocalMatrix();
+
+                shouldUpdateFromSignal = true;
+            }
+        });
+
+        this._globalScale = new Vec3(1);
+        this._globalScale.onChange.add(() => {
+            if (shouldUpdateFromSignal) {
+                shouldUpdateFromSignal = false;
+
+                this.composeWorldMatrix();
+                this.updateLocalMatrix();
+
+                shouldUpdateFromSignal = true;
             }
         });
     }
 
-    updateWorldMatrix() { // fix stupid name
+    composeMatrix() {
+        this._matrix.compose(this._quaternion, this._position, this._scale);
+    }
+
+    decomposeLocal() {
+        this._matrix.getTranslation(this._position); // set up onChange for these functions
+        this._matrix.getRotation(this._quaternion);
+        this._matrix.getScaling(this._scale);
+        this._rotation.fromQuaternion(this._quaternion);
+    }
+
+    updateWorldMatrix() {
+        this.worldFromLocal();
+        this.decomposeWorld();
+    }
+
+    updateLocalMatrix() {
+        this.localFromWorld();
+        this.decomposeLocal();
+    }
+
+    composeWorldMatrix() {
+        this._worldMatrix.compose(this._globalQuaternion, this._globalPosition, this._globalScale);
+    }
+
+    decomposeWorld() {
+        this._worldMatrix.getTranslation(this._globalPosition); // set up onChange for these functions
+        if (this.name == "test") {
+            //console.log(this._globalQuaternion);
+        }
+        this._worldMatrix.getRotation(this._globalQuaternion);
+        if (this.name == "test") {
+            //console.log(this._globalQuaternion);
+        }
+        this._worldMatrix.getScaling(this._globalScale);
+        this._globalRotation.fromQuaternion(this._globalQuaternion);
+    }
+
+    worldFromLocal() { // fix stupid name
         if (this.parent instanceof Transform) this._worldMatrix.multiply(this.parent.worldMatrix, this._matrix);
         else this._worldMatrix.copy(this._matrix);
     }
 
-    updateMatrix() {
-        this.matrix.compose(this.quaternion, this.position, this.scale);
-    }
-
-    decompose() {
-        this.matrix.getTranslation(this._position); // set up onChange for these functions
-        this.matrix.getRotation(this._quaternion);
-        this.matrix.getScaling(this._scale);
-        this.rotation.fromQuaternion(this._quaternion);
+    //this basically takes the current world matrix and makes the local matrix mirror that (inverse of updateWorldMatrix)
+    localFromWorld() { //fix stupid name
+        if (this.parent instanceof Transform) {
+            var tempMat4 = new Mat4(); //IDK MAKE THIS A VAR AT START LIKE EVERYWHERE ELSE???
+            tempMat4.copy(this.parent.worldMatrix);
+            tempMat4.inverse();
+            this._matrix.multiply(tempMat4, this._worldMatrix);
+        }
+        else this._matrix.copy(this._worldMatrix);
     }
 
     lookAt(target, up = new Vec3(0, 1, 0), invert = false) { //should lookAt be using globalmatrix or not???
         if (invert) this.matrix.lookAt(this.position, target, up);
         else this.matrix.lookAt(target, this.position, up);
         this.matrix.getRotation(this.quaternion);
-        this.rotation.fromQuaternion(this.quaternion); // this line necessary?
+        this.rotation.fromQuaternion(this.quaternion); // is this line necessary
     }
 
     get matrix() {
@@ -135,20 +235,109 @@ export class Transform extends Node {
     }
 
     get worldMatrix() {
-        this.updateWorldMatrix();
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+        
         return this._worldMatrix;
     }
     set worldMatrix(value) {
-        //this.updateWorldMatrix(); dont think you need this becayse your setting the whole thing
         this._worldMatrix.set(value);
     }
 
-    // set global variables as underscore properties
-    get globalPosition() { //using standard naming, maybe change worldmatrix to globalmtx
-        var res = new Vec3();
+    get globalPosition() { //using standard naming, maybe change worldmatrix to globalmatrix
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
 
-        this._worldMatrix.getTranslation(res);
+            this.updateWorldMatrix();
 
-        return res;
+            shouldUpdateFromSignal = true;
+        }
+
+        return this._globalPosition;
+    }
+    set globalPosition(value) {
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        this._globalPosition.set(value);
+    }
+
+    get globalRotation() { //using standard naming, maybe change worldmatrix to globalmtx
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        return this._globalRotation;
+    }
+    set globalRotation(value) {
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        this._globalRotation.set(value);
+    }
+
+    get globalQuaternion() { //using standard naming, maybe change worldmatrix to globalmtx
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        return this._globalQuaternion;
+    }
+    set globalQuaternion(value) {
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        this._globalQuaternion.set(value);
+    }
+
+    get globalScale() { //using standard naming, maybe change worldmatrix to globalmtx
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        return this._globalScale;
+    }
+    set globalScale(value) {
+        if (shouldUpdateFromSignal) {
+            shouldUpdateFromSignal = false;
+
+            this.updateWorldMatrix();
+
+            shouldUpdateFromSignal = true;
+        }
+
+        this._globalScale.set(value);
     }
 }

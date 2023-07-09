@@ -1,6 +1,10 @@
 pause game when on another tab
 
+game/app naming convention
+
 transform position and scale getters and setters
+
+global transform globally transforming one frame late 
 
 move scene stuff from renderer to game
 
@@ -24,6 +28,8 @@ make onChange signal for all math data types like matrices, vectors, and color
 
 make transform take into account non transform parents (search for transform parent)
 make sure updatematrixworld is called on every transform regardless of parent
+add rotationDegrees
+make physics run on global transform
 
 typescript veresion
 

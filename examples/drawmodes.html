@@ -98,7 +98,7 @@
             triangles.setParent(app.scene);
             triangles.position.set(1, -1, 0);
 
-            app.update = (dt) => {
+            app.scene.update = (dt) => {
                 program.uniforms.uTime.value = app.time;
             }
 
