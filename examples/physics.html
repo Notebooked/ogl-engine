@@ -27,11 +27,9 @@
                 app.renderer.dpr = 3;
 
                 const camera = new Camera();
-                camera.position.set(0,0,30);
+                camera.position.set(0,0,1);
+                camera.zoom = 700;
                 camera.setParent(app.scene);
-
-                //const controls = new Orbit(camera);
-                //controls.setParent(camera);
 
                 const platform = new Rigidbody2D("platform");
                 platform.setParent(app.scene);
@@ -42,13 +40,13 @@
                 test2.name = "test";
                 platform.isStatic = true;
                 platform.setRectangleShape(3,1);
-                platform.rotation.z = 0.2
+                platform.rotation.z = 0;
 
                 const ball = new Rigidbody2D("ball");
                 ball.setParent(app.scene);
                 const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face - Copy.png'})});
                 test.setParent(ball);
-                ball.position = new Vec3(0,10000,-1);
+                ball.position = new Vec3(0,0,-1);
                 test.name = "test";
                 ball.setCircleShape(0.5);
                 ball.update = (dt) => {

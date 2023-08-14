@@ -50,7 +50,7 @@ export class Rigidbody2D extends Transform {
     }
 
     setCircleShape(radius) {
-        var temp = Matter.Bodies.circle(0,0,radius * scale);
+        var temp = Matter.Bodies.circle(0,0,radius * scale, {}, 100);
         Matter.Body.setVertices(this._body, temp.vertices);
     }
     setRectangleShape(width,height) {

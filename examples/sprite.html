@@ -79,10 +79,11 @@
 
                 const test = new Sprite({texture: TextureLoader.load({src:'assets/grimacing-face.png'})});
                 test.setParent(player);
-                test.position = new Vec3(3,3,0);
+                test.position = new Vec3(1,1,0);
                 test.name = "test";
                 test.update = (dt) => {
-                    //test.position.set(new Vec3(-1,1,0));
+                    player.position.add(player.up.scale(dt * 2));
+                    test.worldMatrix.set(new Mat4());
                 };
                 app.mainloop();
             }

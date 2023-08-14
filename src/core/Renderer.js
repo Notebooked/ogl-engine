@@ -1,6 +1,6 @@
 import { Vec3 } from '../math/Vec3.js';
 import { Color } from '../math/Color.js';
-import { createCanvas, getGlContext, isWebgl2 } from './Canvas.js';
+import { isWebgl2 } from '../gui/RenderCanvas.js';
 // TODO: Handle context loss https://www.khronos.org/webgl/wiki/HandlingContextLost
 
 // Not automatic - devs to use these methods manually
@@ -11,8 +11,6 @@ import { createCanvas, getGlContext, isWebgl2 } from './Canvas.js';
 // gl.clearStencil( stencil );
 
 const tempVec3 = new Vec3();
-
-let gl = null;
 
 export class Renderer {
     #clearColor;
@@ -202,7 +200,6 @@ export class Renderer {
         return this.#clearColor;
     }
     set clearColor(value) {
-        console.log(value);
         this.#clearColor = value;
         this.gl.clearColor(value.r,value.g,value.b,value.a);
     }
@@ -325,7 +322,7 @@ export class Renderer {
     }
 
     render({ scene, camera, target = null, update = true, sort = true, frustumCull = true, clear }) {
-        camera.type = 'orthographic'
+        camera.type = 'orthographic' //TODO: get rid of this stupid
         if (target === null) {
             // make sure no render target bound so draws to canvas
             this.bindFramebuffer();

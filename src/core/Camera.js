@@ -7,18 +7,18 @@ const tempVec3a = new Vec3();
 const tempVec3b = new Vec3();
 
 export class Camera extends Transform {
-    constructor({ near = 0.1, far = 100, fov = 45, aspect = 1, left, right, bottom, top, zoom = 1 } = {}) {
+    constructor({ near = 0.1, far = 100, fov = 45, aspect = 1, leftBound, rightBound, bottom, top, zoom = 800 } = {}) {
         super();
 
-        Object.assign(this, { near, far, fov, aspect, left, right, bottom, top, zoom });
+        Object.assign(this, { near, far, fov, aspect, leftBound, rightBound, bottom, top, zoom });
 
         this.projectionMatrix = new Mat4();
         this.viewMatrix = new Mat4();
         this.projectionViewMatrix = new Mat4();
         this.worldPosition = new Vec3();
 
-        // Use orthographic if left/right set, else default to perspective camera
-        this.type = left || right ? 'orthographic' : 'perspective';
+        // Use orthographic if leftBound/rightBound set, else default to perspective camera
+        this.type = leftBound || rightBound ? 'orthographic' : 'perspective';
 
         if (this.type === 'orthographic') this.orthographic();
         else this.perspective();
@@ -34,18 +34,18 @@ export class Camera extends Transform {
     orthographic({
         near = this.near,
         far = this.far,
-        left = this.left || -1,
-        right = this.right || 1,
+        leftBound = this.leftBound || -1,
+        rightBound = this.rightBound || 1,
         bottom = this.bottom || -1,
         top = this.top || 1,
         zoom = this.zoom,
     } = {}) {
-        Object.assign(this, { near, far, left, right, bottom, top, zoom });
-        left /= zoom;
-        right /= zoom;
+        Object.assign(this, { near, far, leftBound, rightBound, bottom, top, zoom });
+        leftBound /= zoom;
+        rightBound /= zoom;
         bottom /= zoom;
         top /= zoom;
-        this.projectionMatrix.fromOrthogonal({ left, right, bottom, top, near, far });
+        this.projectionMatrix.fromOrthogonal({ left: leftBound, right: rightBound, bottom, top, near, far });
         this.type = 'orthographic';
         return this;
     }

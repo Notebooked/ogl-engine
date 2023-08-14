@@ -2,10 +2,6 @@ pause game when on another tab
 
 game/app naming convention
 
-transform position and scale getters and setters
-
-global transform globally transforming one frame late 
-
 move scene stuff from renderer to game
 
 make line renderer and polygon/shape renderer

@@ -9,16 +9,14 @@ export class Node {
 
         this._game = null;
 
-        this.parentChanged = new Signal(); //doesnt even work
-        this.gameTreeChanging = new Signal(); //put this in setgame
-        this.gameTreeChanged = new Signal(); //and this
+        this.parentChanging = new Signal();
+        this.parentChanged = new Signal();
+        this.gameTreeChanging = new Signal();
+        this.gameTreeChanged = new Signal();
     }
 
     get game() {
         return this._game;
-    }
-    setGame(game) {
-        this._game = game;
     }
 
     get parent() {
@@ -29,17 +27,32 @@ export class Node {
     }
     setParent(parent, notifyParent = true) {
         if (this._parent !== parent) {
+            console.log(this._parent, parent);
+            var oldParent = this._parent;
+
             if (this._parent) this._parent.removeChild(this, false);
 
+            this.parentChanging.fire(parent);
+
             this._parent = parent;
-            if (this._parent instanceof Node) {
-                var oldGame = this._game;
-                this._game = parent.game;
-                this.gameTreeChanged.fire(oldGame = oldGame);
+
+            //change game here:
+            if (this._parent instanceof Node) { //check if we have a new game:
+                if (this._game !== this._parent.game) { //we have a new game
+                    this.gameTreeChanging.fire();
+                    var oldGame = this._game;
+                    this._game = parent.game;
+                    this.gameTreeChanged.fire(oldGame);
+                }
             }
-            else this._game = null;
+            else if (this._parent === null) {
+                this._game = null;
+            }
+            else {throw new Error("Parent of Node object must be another Node or null.");}
 
             if (notifyParent && parent instanceof Node) parent.addChild(this, false);
+
+            this.parentChanged.fire(oldParent);
         }
     }
 
@@ -64,7 +77,7 @@ export class Node {
     }
 
     getNode(name = null, type = null) {
-        var res;
+        var res = null;
         this.traverse((child) => {
             var isChild = true;
             if (name !== null && child.name !== name) {
@@ -80,7 +93,7 @@ export class Node {
     }
 
     findFirstDescendant(name = null, type = null) {
-        var res;
+        var res = null;
         this.traverse((child) => {
             var isChild = true;
             if (name !== null && child.name !== name) {
@@ -93,7 +106,7 @@ export class Node {
             return false;
         })
         if (res !== null) { return res; }
-        this._children.forEach((child) => {
+        this._children.forEach((child) => { //THIS CODE SUCKS YOU SHOULD K
             var res = child.findFirstDescendant(name, type);
             if (res !== null) {
                 return res;
