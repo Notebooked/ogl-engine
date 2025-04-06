@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>OGL ENGINE EDITOR</title> <!-- TODO: update page title -->
+        <link rel="stylesheet" href="editor.css">  <!-- TODO: Update styles -->
+
+        <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="editor">
+            <div class="toolbar">
+                <img src="editorimg/translate.png" alt="">
+                <img src="editorimg/rotate.png" alt="">
+                <div class="menu-dropdown">
+                    <img id="menu" src="editorimg/menu.png" alt="">
+                    <div id="menu-content">
+                        <a class="menu-option" onclick="openProjectFolder();">Open Project Folder</a>
+                        <a class="menu-option">OPEN FILE</a>
+                        <a class="menu-option">OPEN FILE</a>
+                        <a class="menu-option">OPEN FILE</a>
+                    </div>
+                </div>
+            </div>
+            <div class="middle-section">
+                <div class="hierarchy" id="hierarchy" style="width: 100px">
+                    <div class="hierarchy-list"></div>
+                    <div class="vert-dragbar" id="hierarchy-dragbar"></div>
+                </div>
+                <div id="stage-container">
+                    <iframe id="stage" src="" frameborder="0"></iframe>
+                </div>
+                <div class="properties" id="properties" style="width: 100px">
+                    <div class="vert-dragbar" id="properties-dragbar"></div>
+                    <div class="property-list"></div>
+                </div>
+            </div>
+            <div class="assets" id="assets" style="height: 400px">
+                <div class="horiz-dragbar" id="assets-dragbar"></div>
+                <div class="asset-list"></div>
+            </div>
+        </div>
+
+        <script>
+            const hierarchy = document.getElementById("hierarchy");
+            const properties = document.getElementById("properties");
+            const assets = document.getElementById("assets");
+            
+            const hierarchyDragbar = document.getElementById("hierarchy-dragbar");
+            const propertiesDragbar = document.getElementById("properties-dragbar");
+            const assetsDragbar = document.getElementById("assets-dragbar");
+
+            let hierarchyWidth = 100;
+            let propertiesWidth = 100;
+            let assetsHeight = 400;
+
+            let hierarchyDragging = false;
+            let propertiesDragging = false;
+            let assetsDragging = false;
+
+            hierarchyDragbar.onmousedown = () => {
+                hierarchyDragging = true;
+            };
+            propertiesDragbar.onmousedown = () => {
+                propertiesDragging = true;
+            };
+            assetsDragbar.onmousedown = () => {
+                assetsDragging = true;
+            };
+            document.addEventListener("mousemove", (e) => {
+                if (hierarchyDragging === true) {
+                    hierarchyWidth += e.movementX;
+                    hierarchy.style.width = hierarchyWidth + 'px';
+                }
+                else if (propertiesDragging === true) {
+                    propertiesWidth -= e.movementX;
+                    properties.style.width = propertiesWidth + 'px';
+                }
+                else if (assetsDragging === true) {
+                    assetsHeight -= e.movementY;
+                    assets.style.height = assetsHeight + 'px';
+                }
+            });
+
+            document.addEventListener("mouseup", (e) => {
+                hierarchyDragging = false;
+                propertiesDragging = false;
+                assetsDragging = false;
+            });
+        </script>
+
+        <script>
+            const menu = document.getElementById("menu");
+            const menuContent = document.getElementById("menu-content");
+            document.addEventListener("click", (e) => {
+                if (event.target !== menu) {
+                    menuContent.classList.remove("show-menu-content");
+                }
+                else {
+                    menuContent.classList.toggle("show-menu-content");
+                }
+            })
+        </script>
+
+        <script type="module">
+            let projectXML;
+
+            function getProjectXMLFile(fileList) {
+                for (let i = 0; i < fileList.length; i++) {
+                    if (fileList[i].name === "project.xml") return fileList[i];
+                }
+                return null;
+            }
+
+            async function loadProject(projectXMLFile) {
+                const parser = new DOMParser();
+
+                const xmlText = await projectXMLFile.text();
+
+                projectXML = parser.parseFromString(xmlText, 'text/xml');
+                console.log(projectXML);
+            }
+
+            const stage = document.getElementById("stage");
+            function openProjectFolder() {
+                const filePicker = document.createElement("input");
+                filePicker.type = "file";
+                filePicker.id = "picker"
+                filePicker.name = "fileList";
+                filePicker.webkitdirectory = true;
+                filePicker.multiple = true;
+
+                filePicker.addEventListener('change', e => {
+                    const projectXMLFile = getProjectXMLFile(e.target.files);
+
+                    if (projectXMLFile === null) throw new Error('The loaded project folder does not have a project.xml');
+
+                    loadProject(projectXMLFile);
+                })
+
+                filePicker.click();
+            }
+        </script>
+    </body>
+</html>

@@ -14,7 +14,11 @@ export function isWebgl2() {
 }
 
 export function createCanvas(renderer, { webgl, attributes }) {
-    var canvas = document.createElement('canvas');
+    var canvas = document.getElementById("game-canvas");
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+    }
 
     // Attempt WebGL2 unless forced to 1, if not supported fallback to WebGL1
     if (webgl === 2) gl = canvas.getContext('webgl2', attributes);

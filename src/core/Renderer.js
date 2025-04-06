@@ -1,6 +1,7 @@
 import { Vec3 } from '../math/Vec3.js';
 import { Color } from '../math/Color.js';
-import { isWebgl2 } from '../gui/RenderCanvas.js';
+import { getGlContext, createCanvas, isWebgl2 } from './Canvas.js';
+import { Camera } from './Camera.js';
 // TODO: Handle context loss https://www.khronos.org/webgl/wiki/HandlingContextLost
 
 // Not automatic - devs to use these methods manually
@@ -14,7 +15,7 @@ const tempVec3 = new Vec3();
 
 export class Renderer {
     #clearColor;
-    constructor({
+    constructor(game, {
         width = 300,
         height = 150,
         dpr = 2,
@@ -28,6 +29,10 @@ export class Renderer {
         autoClear = true,
         webgl = 2,
     } = {}) {
+        this.game = game;
+        this.resizeHandler = () => {};
+        document.addEventListener("resize", (e) => {this.resizeHandler()});
+
         const attributes = { alpha, depth, stencil, antialias, premultipliedAlpha, preserveDrawingBuffer, powerPreference };
         createCanvas(this, {webgl, attributes});
         this.dpr = dpr;
@@ -39,8 +44,6 @@ export class Renderer {
         this.autoClear = autoClear;
 
         this.gl = getGlContext();
-
-        gl = this.gl;
 
         // initialise size values
         this.setSize(width, height);
@@ -106,6 +109,39 @@ export class Renderer {
             : 0;
 
         this.clearColor = new Color(1,1,1,1);
+    }
+
+    resizeSceneCamera(width, height) {
+        const gl = this.gl;
+
+        var camera = this.game.scene.findFirstDescendant(null,Camera);
+        if (camera === null) {
+            throw new Error("There is no Camera in the scene");
+        }
+
+        this.setSize(width, height);
+        var aspect = gl.canvas.width / gl.canvas.height;
+        if (camera.type === "perspective") {
+            camera.perspective({ aspect });
+        }
+        else {
+            camera.orthographic({ leftBound: -gl.canvas.width, rightBound: gl.canvas.width, top: gl.canvas.height, bottom: -gl.canvas.height, zoom: camera.zoom });
+        }
+    }
+
+    autoResizeToWindow() {
+        this.resizeHandler = () => this.resizeSceneCamera(window.innerWidth, window.innerHeight);
+    }
+
+    renderSceneCamera() {
+        var camera = this.game.scene.findFirstDescendant(null,Camera);
+        if (camera === null) {
+            throw new Error("There is no Camera in the scene");
+        }
+
+        this.resizeHandler();
+
+        this.render({ scene: this.game.scene, camera });
     }
 
     setSize(width, height) {

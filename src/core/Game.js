@@ -15,46 +15,13 @@ export class Game {
     constructor(scene = new Transform()) {
         this.setScene(scene);
 
-        this.renderer = new Renderer();
+        this.renderer = new Renderer(this);
         this.physicsEngine2D = new PhysicsEngine2D(this);
         this.inputManager = new InputManager();
     }
 
     get time() {
         return this.#time;
-    }
-
-    addCanvasToPage() {
-        document.body.appendChild(getGlContext().canvas);
-    }
-
-    resize() {
-        const gl = getGlContext();
-
-        var camera = this.scene.findFirstDescendant(null,Camera);
-        if (camera === null) {
-            throw new Error("There is no Camera in the scene");
-        }
-
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        var aspect = gl.canvas.width / gl.canvas.height;
-        if (camera.type === "perspective") {
-            camera.perspective({ aspect });
-        }
-        else {
-            camera.orthographic({ left: -gl.canvas.width, right: gl.canvas.width, top: gl.canvas.height, bottom: -gl.canvas.height, zoom: 1000 });
-        }
-    }
-
-    render() {
-        var camera = this.scene.findFirstDescendant(null,Camera);
-        if (camera === null) {
-            throw new Error("There is no Camera in the scene");
-        }
-
-        this.resize();
-
-        this.renderer.render({ scene: this.scene, camera });
     }
 
     mainloop() {
@@ -70,14 +37,11 @@ export class Game {
 
         this.#time += dt;
 
-        console.log("start");
-
         this.scene.broadcast('update',dt);
 
         this.physicsEngine2D._update(dt);
 
-        this.render();
-        console.log("RENDEREWR")
+        this.renderer.renderSceneCamera();
         
         requestAnimationFrame((now) => {this.loop(now);})
     }
@@ -87,6 +51,6 @@ export class Game {
     }
     setScene(scene) {
         this.#scene = scene;
-        this.#scene.setGame(this);
+        this.#scene._game = this;
     }
 }

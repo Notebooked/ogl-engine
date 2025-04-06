@@ -10,17 +10,17 @@
         <link rel="icon" type="image/png" href="assets/favicon.png" />
         <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
         <title>OGL Engine • Sprite Demo</title>
-        <link href="../oglexamples/assets/main.css" rel="stylesheet" />
+        <link href="../../../oglexamples/assets/main.css" rel="stylesheet" />
     </head>
     <body>
         <div class="Info">Sprite Demo</div>
         <script type="module">
-            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, InputManager, Color, Transform, Mat4, Euler } from '../src/index.mjs';
+            import { Game, Camera, Orbit, TextureLoader, Sprite, Vec3, InputManager, Color, Transform, Mat4, Euler } from '../../index.mjs';
 
             class Player extends Sprite {
                 constructor(name,parent=null) {
-                    const spriteTexture = TextureLoader.load({src: 'assets/grimacing-face - Copy.png'});
-                    super({texture: spriteTexture});
+                    const spriteTexture = TextureLoader.load({src: 'assets/grimacing-face - Copy.png'})
+                    super({texture: spriteTexture})
                     this.scale = new Vec3(1,1,1);
 
                     this.speed = 4;
@@ -64,6 +64,7 @@
             {
                 const app = new Game();
                 app.renderer.clearColor = new Color(0.1,0.1,0.2,1);
+                app.renderer.autoResizeToWindow();
 
                 app.renderer.dpr = 3;
 
